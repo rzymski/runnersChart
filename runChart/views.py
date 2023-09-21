@@ -1,14 +1,30 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import *
+from .forms import RunningLapForm
 
 def index(request):
-
-    runners = Runner.objects.all()
     runningLaps = RunningLap.objects.all()
 
-    data = "Current Data"
+    if request.method == 'POST':
+        form = RunningLapForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('index')
+    else:
+        form = RunningLapForm()
+
     context = {
-        "data":data
+        "runningLaps": runningLaps,
+        "form":form
     }
     return render(request, 'run/index.html', context)
+
+# def index(request):
+#     runningLaps = RunningLap.objects.all()
+#
+#     context = {
+#         "runningLaps": runningLaps
+#     }
+#
+#     return render(request, 'run/index.html', context)
