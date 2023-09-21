@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
                     "runnerId",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to="runDiagram.runner",
+                        to="runChart.runner",
                         verbose_name="Id biegacza",
                     ),
                 ),

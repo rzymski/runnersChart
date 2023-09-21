@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("runDiagram", "0003_alter_runninglap_endlaptime"),
+        ("runChart", "0003_alter_runninglap_endlaptime"),
     ]
 
     operations = [

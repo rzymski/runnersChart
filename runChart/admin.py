@@ -16,37 +16,8 @@ from django.db.models import Q
 class CsvImportForm(forms.Form):
     csv_upload = forms.FileField()
 
-# def upload_csvFileUniversal(request, model_name):
-#     model = apps.get_model(app_label='runDiagram', model_name=model_name)
-#     if request.method == "POST":
-#         csv_file = request.FILES["csv_upload"]
-#         file_data = csv_file.read().decode("utf-8-sig")
-#         lines = file_data.strip().split('\n')
-#         headers = lines[0].strip().split(';')
-#         for line in lines[1:]:
-#             values = line.strip().split(';')
-#             instance = model()
-#             for header, value in zip(headers, values):
-#                 if value.lower() == 'none' or value.lower() == 'null' or value.lower() == '':
-#                     setattr(instance, header, None)
-#                 elif header == "runnerId":
-#                     setattr(instance, header, Runner.objects.get(id=value))
-#                 else:
-#                     setattr(instance, header, value)
-#             if model_name != "Runner":
-#                 try:
-#                     metric = model.objects.get(runnerId=instance.runnerId, endLapTime=instance.endLapTime)
-#                     metric.delete()
-#                 except model.DoesNotExist:
-#                     pass
-#             instance.save()
-#         url = reverse(f'admin:runDiagram_{model_name.lower()}_changelist')
-#         return HttpResponseRedirect(url)
-#     form = CsvImportForm()
-#     data = {"form": form}
-#     return render(request, "admin/csvFile_upload.html", data)
 def upload_csvFileUniversal(request, model_name):
-    model = apps.get_model(app_label='runDiagram', model_name=model_name)
+    model = apps.get_model(app_label='runChart', model_name=model_name)
     if request.method == "POST":
         csv_file = request.FILES["csv_upload"]
         file_data = csv_file.read().decode("utf-8-sig")
@@ -71,7 +42,7 @@ def upload_csvFileUniversal(request, model_name):
             else:
                 instance = model(**obj_dict)
                 instance.save()
-        url = reverse(f'admin:runDiagram_{model_name.lower()}_changelist')
+        url = reverse(f'admin:runChart_{model_name.lower()}_changelist')
         return HttpResponseRedirect(url)
     form = CsvImportForm()
     data = {"form": form}

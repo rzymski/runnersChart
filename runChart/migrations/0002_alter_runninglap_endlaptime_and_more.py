@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("runDiagram", "0001_initial"),
+        ("runChart", "0001_initial"),
     ]
 
     operations = [
@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
             name="runnerId",
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                to="runDiagram.runner",
+                to="runChart.runner",
                 verbose_name="Biegacz",
             ),
         ),

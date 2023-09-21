@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("runDiagram", "0006_runninglap_numberoflaps"),
+        ("runChart", "0006_runninglap_numberoflaps"),
     ]
 
     operations = [
