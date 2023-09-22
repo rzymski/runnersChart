@@ -18,13 +18,19 @@ def index(request):
         "runningLaps": runningLaps,
         "form":form
     }
-    return render(request, 'run/index.html', context)
+    # return render(request, 'chart/index.html', context)
+    return render(request, 'chart/line.html', context)
 
-# def index(request):
-#     runningLaps = RunningLap.objects.all()
-#
-#     context = {
-#         "runningLaps": runningLaps
-#     }
-#
-#     return render(request, 'run/index.html', context)
+def bar_chart(request):
+    runningLaps = RunningLap.objects.all()
+    context = {
+        "runningLaps": runningLaps
+    }
+    return render(request, 'chart/bar.html', context)
+
+def line_chart(request):
+    runningLaps = RunningLap.objects.all()
+    context = {
+        "runningLaps": runningLaps
+    }
+    return render(request, 'chart/line.html', context)
