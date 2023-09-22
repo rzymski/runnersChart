@@ -1,38 +1,60 @@
 {% extends 'partials/base.html' %}
 
 {% block content %}
-    <h2>Wykres linowy biegaczy</h2>
+    <h2>Line Chart</h2>
 
     <div class="row mt-4">
-        <div class="col md-12">
+        <div class="col-md-12">
 
             <div>
-              <canvas id="myChart"></canvas>
+                <canvas id="myLineChart"></canvas>
             </div>
 
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
             <script>
-              const ctx = document.getElementById('myChart');
+                const data = {{ dict|safe }};
+                const labels = Object.keys(data);
+                const values = Object.values(data);
 
-              new Chart(ctx, {
-                type: 'bar',
-                data: {
-                  labels: [{% for runningLap in runningLaps %} '{{ runningLap.runnerId}}', {% endfor %}],
-                  datasets: [{
-                    label: '# of Runners',
-                    data: [{% for runningLap in runningLaps %} {{ runningLap.numberOfLaps }}, {% endfor %}],
-                    borderWidth: 1
-                  }]
-                },
-                options: {
-                  scales: {
-                    y: {
-                      beginAtZero: true
+                const ctx = document.getElementById('myLineChart').getContext('2d');
+                const myLineChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Number of Laps',
+                            data: values,
+                            fill: false,  // Line chart
+                            borderColor: 'rgb(75, 192, 192)',  // Line color
+                            tension: 0.1,  // Line tension
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'time',  // X-axis type is time
+                                time: {
+                                    unit: 'minute',  // Customize time unit as needed
+                                    tooltipFormat: 'll HH:mm',  // Tooltip format
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Date and Time',
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Number of Laps',
+                                }
+                            }
+                        }
                     }
-                  }
-                }
-              });
+                });
             </script>
 
         </div>
