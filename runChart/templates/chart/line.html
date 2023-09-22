@@ -2,28 +2,34 @@
 
 {% block content %}
     <h2>Line Chart</h2>
-
     <div class="row mt-4">
         <div class="col-md-12">
-
             <div>
                 <canvas id="myLineChart"></canvas>
             </div>
-
+            <div class="row mt-4">
+                <div class="col-md-11"></div>
+                <div class="col-md-1">
+                    <button class="btn btn-outline-success" id="toggleLinesButton" onclick="showHideLines()">Hide/Show all runners</button>
+                </div>
+            </div>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
             <script>
                 const laps = {{laps|safe}};
                 const runners = {{ runners|safe }};
                 const labels = {{labels|safe}};
                 const colors = {{colors|safe}};
                 const datasets = [];
+                const runsData = {{ runsData|safe }};
+
                 for(let i = 0; i < runners.length; i++){
+                    const backgroundColor = [colors[i % 30]];
+                    const borderColor = [colors[i % 30]]
                     datasets.push({
                         label: `${runners[i]}`,
-                        data: laps[i],
-                        borderColor: `${colors[i%30]}`,
-                        backgroundColor: `${colors[i%30]}`,
+                        data: runsData[i],
+                        borderColor: borderColor,
+                        backgroundColor: backgroundColor,
                     });
                 }
 
@@ -38,18 +44,73 @@
                         responsive: true,
                         plugins: {
                             legend: {
+                                title: {
+                                  display: true,
+                                  text: 'Biegacze'  ,
+                                },
                                 position: 'right',
+                                onHover: handleHover,
+                                onLeave: handleLeave,
                             },
                             title: {
                                 display: true,
-                                text: 'Wykres liniowy biegaczy'
+                                text: 'Wykres najlepszych biegaczy'
+                            }
+                        },
+                        scales: {
+                            x:{
+                                title: {
+                                    display: true,
+                                    text: 'czas'
+                                },
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Liczba okrążeń'
+                                },
+                                min: 0,
+                                ticks: {
+                                    stepSize: 1
+                                },
+                                suggestedMax: 5,
                             }
                         }
                     }
                 });
-            </script>
 
+                function handleHover(evt, item, legend) {
+                    if (item && item.datasetIndex !== undefined) {
+                        const hoveredIndex = item.datasetIndex;
+                        const datasets = myLineChart.data.datasets;
+                        for (let i = 0; i < datasets.length; i++) {
+                            if (i !== hoveredIndex) {
+                                datasets[i].hidden = true;
+                            }
+                        }
+                        myLineChart.update();
+                    }
+                }
+                function handleLeave(evt, item, legend) {
+                    if (item && item.datasetIndex !== undefined) {
+                        const datasets = myLineChart.data.datasets;
+                        for (let i = 0; i < datasets.length; i++) {
+                            datasets[i].hidden = false;
+                        }
+                        myLineChart.update();
+                    }
+                }
+
+                let linesVisible = true;
+                function showHideLines(){
+                    const datasets = myLineChart.data.datasets;
+                    for (let i = 0; i < datasets.length; i++) {
+                        datasets[i].hidden = linesVisible;
+                    }
+                    myLineChart.update();
+                    linesVisible = !linesVisible;
+                }
+            </script>
         </div>
     </div>
-
 {% endblock %}

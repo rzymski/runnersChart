@@ -97,7 +97,7 @@ class RunningLapAdmin(admin.ModelAdmin):
             return datetime(2023, 10, 22, endLapTime.hour, endLapTime.minute)
     def countLap(self, runner_id, end_lap_date):
         query = Q(runnerId=runner_id, endLapDate__lt=end_lap_date)
-        number = RunningLap.objects.filter(query).count() + 1
+        number = RunningLap.objects.filter(query).count()
         return number
 
     def get_urls(self):
