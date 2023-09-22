@@ -30,52 +30,6 @@ colors = ['rgb(255,51,51)', 'rgb(255,128,0)', 'rgb(255,255,0)', 'rgb(221,160,221
               'rgb(229,204,255)', 'rgb(255,204,255)', 'rgb(255,204,229)', 'rgb(153,0,0)', 'rgb(153,153,0)',
               'rgb(255,215,0)', 'rgb(255,140,0)', 'rgb(192,192,192)', 'rgb(148,0,211)', ]
 
-def bar_chart(request):
-    time_strings = [dt.strftime('%H:%M') for dt in list(get_laps_for_every_time())]
-    runners = []
-    for runner in Runner.objects.all():
-        stringRunner = str(runner)
-        runners.append(stringRunner)
-    laps = get_laps_for_every_runner_transpose_matrix()
-    print(laps)
-
-    context = {
-        'labelTimes': time_strings,
-        'lapsInEveryTime': laps,
-        'runners': runners,
-        'colors': colors,
-    }
-    return render(request, 'chart/bar.html', context)
-
-def get_laps_for_every_runner_transpose_matrix():
-    result = []
-    runners = Runner.objects.all()
-    for runner in runners:
-        laps = RunningLap.objects.filter(runnerId=runner).order_by('endLapDate')
-        lapsNumbersList = []
-        for lap in laps:
-            lapsNumbersList.append(lap.endLapTime.__str__())
-        result.append(lapsNumbersList)
-
-    # x = result[0][0]
-    # print(type(x))
-    # x2 = x.replace(hour=18, minute=0)
-
-    #kwadratowa macierz
-    max_length = max(len(inner_list) for inner_list in result)
-    square_matrix = [['18:00'] * max_length for _ in range(max_length)]
-    for i in range(len(result)):
-        for j in range(len(result[i])):
-            square_matrix[i][j] = result[i][j]
-    #transpozycja macierzy
-    max_length = max(len(inner_list) for inner_list in square_matrix)
-    transposed = [[] for _ in range(max_length)]
-    for inner_list in square_matrix:
-        for i, value in enumerate(inner_list):
-            transposed[i].append(value)
-    print(transposed)
-    return transposed
-
 def line_chart(request):
     time_strings = [dt.strftime('%H:%M') for dt in list(get_laps_for_every_time())]
     runners = []
