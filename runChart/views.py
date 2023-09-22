@@ -4,6 +4,7 @@ from .models import *
 from .forms import RunningLapForm
 from datetime import datetime, timezone
 
+
 def index(request):
     runningLaps = RunningLap.objects.all()
 
@@ -17,17 +18,63 @@ def index(request):
 
     context = {
         "runningLaps": runningLaps,
-        "form":form
+        "form": form
     }
     # return render(request, 'chart/index.html', context)
     return line_chart(request)
 
+colors = ['rgb(255,51,51)', 'rgb(255,128,0)', 'rgb(255,255,0)', 'rgb(221,160,221)', 'rgb(0,255,0)',
+              'rgb(160,82,45)', 'rgb(0,255,255)', 'rgb(0,128,255)', 'rgb(0,0,255)', 'rgb(127,0,255)', 'rgb(255,0,255)',
+              'rgb(255,0,127)', 'rgb(128,128,128)', 'rgb(0,0,0)', 'rgb(255,204,204)', 'rgb(255,229,204)',
+              'rgb(255,255,204)', 'rgb(229,255,229)', 'rgb(204,255,255)', 'rgb(204,229,255)', 'rgb(204,204,255)',
+              'rgb(229,204,255)', 'rgb(255,204,255)', 'rgb(255,204,229)', 'rgb(153,0,0)', 'rgb(153,153,0)',
+              'rgb(255,215,0)', 'rgb(255,140,0)', 'rgb(192,192,192)', 'rgb(148,0,211)', ]
+
 def bar_chart(request):
-    runningLaps = RunningLap.objects.all()
+    time_strings = [dt.strftime('%H:%M') for dt in list(get_laps_for_every_time())]
+    runners = []
+    for runner in Runner.objects.all():
+        stringRunner = str(runner)
+        runners.append(stringRunner)
+    laps = get_laps_for_every_runner_transpose_matrix()
+    print(laps)
+
     context = {
-        "runningLaps": runningLaps
+        'labelTimes': time_strings,
+        'lapsInEveryTime': laps,
+        'runners': runners,
+        'colors': colors,
     }
     return render(request, 'chart/bar.html', context)
+
+def get_laps_for_every_runner_transpose_matrix():
+    result = []
+    runners = Runner.objects.all()
+    for runner in runners:
+        laps = RunningLap.objects.filter(runnerId=runner).order_by('endLapDate')
+        lapsNumbersList = []
+        for lap in laps:
+            lapsNumbersList.append(lap.endLapTime.__str__())
+        result.append(lapsNumbersList)
+
+    # x = result[0][0]
+    # print(type(x))
+    # x2 = x.replace(hour=18, minute=0)
+
+    #kwadratowa macierz
+    max_length = max(len(inner_list) for inner_list in result)
+    square_matrix = [['18:00'] * max_length for _ in range(max_length)]
+    for i in range(len(result)):
+        for j in range(len(result[i])):
+            square_matrix[i][j] = result[i][j]
+    #transpozycja macierzy
+    max_length = max(len(inner_list) for inner_list in square_matrix)
+    transposed = [[] for _ in range(max_length)]
+    for inner_list in square_matrix:
+        for i, value in enumerate(inner_list):
+            transposed[i].append(value)
+    print(transposed)
+    return transposed
 
 def line_chart(request):
     time_strings = [dt.strftime('%H:%M') for dt in list(get_laps_for_every_time())]
@@ -35,13 +82,10 @@ def line_chart(request):
     for runner in Runner.objects.all():
         stringRunner = str(runner)
         runners.append(stringRunner)
-    laps = get_laps_for_every_runner()
-    colors = ['rgb(255,51,51)','rgb(255,128,0)','rgb(255,255,0)','rgb(221,160,221)','rgb(0,255,0)','rgb(160,82,45)','rgb(0,255,255)','rgb(0,128,255)','rgb(0,0,255)','rgb(127,0,255)','rgb(255,0,255)','rgb(255,0,127)','rgb(128,128,128)','rgb(0,0,0)','rgb(255,204,204)','rgb(255,229,204)','rgb(255,255,204)','rgb(229,255,229)','rgb(204,255,255)','rgb(204,229,255)','rgb(204,204,255)','rgb(229,204,255)','rgb(255,204,255)','rgb(255,204,229)','rgb(153,0,0)','rgb(153,153,0)','rgb(255,215,0)','rgb(255,140,0)','rgb(192,192,192)','rgb(148,0,211)',]
     runsData = get_runners_laps_in_time()
     context = {
         'labels': time_strings,
         'runners': runners,
-        'laps': laps,
         'colors': colors,
         'runsData': runsData,
     }
@@ -59,17 +103,9 @@ def get_runners_laps_in_time():
 
     for run in runningLaps:
         if run.runnerId != None:
-            result[run.runnerId.id-1].append({'x':run.endLapTime.strftime('%H:%M'), 'y':run.numberOfLaps})
+            result[run.runnerId.id - 1].append({'x': run.endLapTime.strftime('%H:%M'), 'y': run.numberOfLaps})
     return result
 
-def get_laps_for_every_runner():
-    dict = get_laps_for_every_time()
-    laps = []
-    for i in range(Runner.objects.count()):
-        laps.append([])
-        for d in dict:
-            laps[i].append(dict[d][i])
-    return laps
 
 import pytz
 def get_laps_for_every_time():
@@ -82,8 +118,9 @@ def get_laps_for_every_time():
     runners = Runner.objects.all()
     for endLapDate in dict:
         for runner in runners:
-            dict[endLapDate][runner.id-1] = get_max_laps_for_runner_before_date(runner.id, endLapDate)
+            dict[endLapDate][runner.id - 1] = get_max_laps_for_runner_before_date(runner.id, endLapDate)
     return dict
+
 
 def get_max_laps_for_runner_before_date(runner_id, end_lap_date):
     max_laps = RunningLap.objects.filter(

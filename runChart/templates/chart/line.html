@@ -1,7 +1,7 @@
 {% extends 'partials/base.html' %}
 
 {% block content %}
-    <h2>Line Chart</h2>
+    <h1>Line Chart</h1>
     <div class="row mt-4">
         <div class="col-md-12">
             <div>
@@ -15,9 +15,8 @@
             </div>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
-                const laps = {{laps|safe}};
                 const runners = {{ runners|safe }};
-                const labels = {{labels|safe}};
+                const labelTimes = {{labels|safe}};
                 const colors = {{colors|safe}};
                 const datasets = [];
                 const runsData = {{ runsData|safe }};
@@ -37,7 +36,7 @@
                 const myLineChart = new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: labels,
+                        labels: labelTimes,
                         datasets: datasets
                     },
                     options: {
