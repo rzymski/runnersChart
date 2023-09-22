@@ -49,8 +49,6 @@
                                   text: 'Biegacze'  ,
                                 },
                                 position: 'right',
-                                onHover: handleHover,
-                                onLeave: handleLeave,
                             },
                             title: {
                                 display: true,
@@ -78,28 +76,6 @@
                         }
                     }
                 });
-
-                function handleHover(evt, item, legend) {
-                    if (item && item.datasetIndex !== undefined) {
-                        const hoveredIndex = item.datasetIndex;
-                        const datasets = myLineChart.data.datasets;
-                        for (let i = 0; i < datasets.length; i++) {
-                            if (i !== hoveredIndex) {
-                                datasets[i].hidden = true;
-                            }
-                        }
-                        myLineChart.update();
-                    }
-                }
-                function handleLeave(evt, item, legend) {
-                    if (item && item.datasetIndex !== undefined) {
-                        const datasets = myLineChart.data.datasets;
-                        for (let i = 0; i < datasets.length; i++) {
-                            datasets[i].hidden = false;
-                        }
-                        myLineChart.update();
-                    }
-                }
 
                 let linesVisible = true;
                 function showHideLines(){
