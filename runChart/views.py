@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import *
 from .forms import RunningLapForm
+from datetime import datetime, timezone
 
 def index(request):
     runningLaps = RunningLap.objects.all()
@@ -19,7 +20,7 @@ def index(request):
         "form":form
     }
     # return render(request, 'chart/index.html', context)
-    return render(request, 'chart/line.html', context)
+    return line_chart(request)
 
 def bar_chart(request):
     runningLaps = RunningLap.objects.all()
@@ -52,6 +53,10 @@ def get_runners_laps_in_time():
     for i in range(Runner.objects.count()):
         result.append([])
     runningLaps = RunningLap.objects.all()
+
+    for runner in Runner.objects.all():
+        result[runner.id - 1].append({'x': '18:00', 'y': 0})
+
     for run in runningLaps:
         if run.runnerId != None:
             result[run.runnerId.id-1].append({'x':run.endLapTime.strftime('%H:%M'), 'y':run.numberOfLaps})
@@ -68,9 +73,11 @@ def get_laps_for_every_runner():
 
 import pytz
 def get_laps_for_every_time():
-    running_laps = list(RunningLap.objects.values_list('endLapDate', flat=True).distinct().order_by('endLapDate'))
+    runningLapsDates = list(RunningLap.objects.values_list('endLapDate', flat=True).distinct().order_by('endLapDate'))
+    new_datetime = datetime(2023, 10, 21, 18, 0)
+    runningLapsDates.insert(0, new_datetime)
     europe_warsaw = pytz.timezone('Europe/Warsaw')
-    running_laps = [dt.astimezone(europe_warsaw) for dt in running_laps]
+    running_laps = [dt.astimezone(europe_warsaw) for dt in runningLapsDates]
     dict = {running_lap: [0] * Runner.objects.count() for running_lap in running_laps}
     runners = Runner.objects.all()
     for endLapDate in dict:
