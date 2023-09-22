@@ -1,26 +1,10 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import *
-from .forms import RunningLapForm
 from datetime import datetime, timezone
 
 
 def index(request):
-    runningLaps = RunningLap.objects.all()
-
-    if request.method == 'POST':
-        form = RunningLapForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('index')
-    else:
-        form = RunningLapForm()
-
-    context = {
-        "runningLaps": runningLaps,
-        "form": form
-    }
-    # return render(request, 'chart/index.html', context)
     return line_chart(request)
 
 colors = ['rgb(255,51,51)', 'rgb(255,128,0)', 'rgb(255,255,0)', 'rgb(221,160,221)', 'rgb(0,255,0)',
