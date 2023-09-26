@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import *
-from datetime import datetime, timezone
+from datetime import datetime, time
+from django.utils import timezone
 
 
 def index(request):
@@ -16,6 +17,7 @@ colors = ['rgb(255,51,51)', 'rgb(255,128,0)', 'rgb(255,255,0)', 'rgb(221,160,221
 
 def line_chart(request):
     time_strings = [dt.strftime('%H:%M') for dt in list(get_laps_for_every_time())]
+    print(time_strings)
     runners = []
     for runner in Runner.objects.all():
         stringRunner = str(runner)
@@ -39,9 +41,11 @@ def get_runners_laps_in_time():
     for runner in Runner.objects.all():
         result[runner.id - 1].append({'x': '18:00', 'y': 0})
 
+    warsaw_tz = pytz.timezone('Europe/Warsaw')
     for run in runningLaps:
         if run.runnerId != None:
-            result[run.runnerId.id - 1].append({'x': run.endLapTime.strftime('%H:%M'), 'y': run.numberOfLaps})
+            end_lap_date_warsaw = run.endLapDate.astimezone(warsaw_tz)
+            result[run.runnerId.id - 1].append( {'x': time(end_lap_date_warsaw.hour, end_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps})
     return result
 
 
