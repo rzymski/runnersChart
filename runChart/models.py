@@ -10,7 +10,8 @@ class Runner(models.Model):
 
 class RunningLap(models.Model):
     runnerId = models.ForeignKey(Runner, on_delete=models.CASCADE, verbose_name="Biegacz")
-    endLapDate = models.DateTimeField(verbose_name="Data zakonczenia okrazenia")
+    startLapDate = models.DateTimeField(default=datetime(2023, 10, 21, 21, 30), verbose_name="Data rozpoczecia okrazenia")
+    endLapDate = models.DateTimeField(default=datetime(2023, 10, 22, 9, 30), verbose_name="Data zakonczenia okrazenia")
     numberOfLaps = models.IntegerField(default=0, verbose_name='Liczba okrazen')
     def __str__(self):
         return f"{self.runnerId} {self.endLapDate.strftime('%H:%M')}"

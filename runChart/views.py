@@ -36,10 +36,10 @@ def get_runners_laps_in_time():
     result = []
     for i in range(Runner.objects.count()):
         result.append([])
-    runningLaps = RunningLap.objects.all()
+    runningLaps = RunningLap.objects.all().order_by('endLapDate')
 
     for runner in Runner.objects.all():
-        result[runner.id - 1].append({'x': '18:00', 'y': 0})
+        result[runner.id - 1].append({'x': '21:30', 'y': 0})
 
     warsaw_tz = pytz.timezone('Europe/Warsaw')
     for run in runningLaps:
@@ -52,7 +52,7 @@ def get_runners_laps_in_time():
 import pytz
 def get_laps_for_every_time():
     runningLapsDates = list(RunningLap.objects.values_list('endLapDate', flat=True).distinct().order_by('endLapDate'))
-    new_datetime = datetime(2023, 10, 21, 18, 0)
+    new_datetime = datetime(2023, 10, 21, 21, 30)
     runningLapsDates.insert(0, new_datetime)
     europe_warsaw = pytz.timezone('Europe/Warsaw')
     running_laps = [dt.astimezone(europe_warsaw) for dt in runningLapsDates]

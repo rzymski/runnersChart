@@ -31,9 +31,16 @@ def upload_csvFileUniversal(request, model_name):
                     obj_dict[header] = None
                 elif header == "runnerId":
                     obj_dict[header] = Runner.objects.get(id=value)
+                elif header == "startLapDate":
+                    start_lap_time_obj = datetime.strptime(value, "%H:%M").time()
+                    if start_lap_time_obj >= time(21, 30):
+                        start_lap_date_obj = timezone.make_aware(datetime(2023, 10, 21, start_lap_time_obj.hour, start_lap_time_obj.minute))
+                    else:
+                        start_lap_date_obj = timezone.make_aware(datetime(2023, 10, 22, start_lap_time_obj.hour, start_lap_time_obj.minute))
+                    obj_dict[header] = start_lap_date_obj
                 elif header == "endLapDate":
                     end_lap_time_obj = datetime.strptime(value, "%H:%M").time()
-                    if end_lap_time_obj > time(18, 0):
+                    if end_lap_time_obj >= time(21, 30):
                         end_lap_date_obj = timezone.make_aware(datetime(2023, 10, 21, end_lap_time_obj.hour, end_lap_time_obj.minute))
                     else:
                         end_lap_date_obj = timezone.make_aware(datetime(2023, 10, 22, end_lap_time_obj.hour, end_lap_time_obj.minute))
@@ -72,21 +79,28 @@ class RunningLapForm(forms.ModelForm):
     class Meta:
         model = RunningLap
         fields = '__all__'
-    endLapTime = forms.TimeField(widget=widgets.AdminTimeWidget)
+
+    startLapTime = forms.TimeField(widget=widgets.AdminTimeWidget, label="Czas rozpoczecia okrazenia")
+    endLapTime = forms.TimeField(widget=widgets.AdminTimeWidget, label="Czas zakonczenia okrazenia")
 
 @admin.register(RunningLap)
 class RunningLapAdmin(admin.ModelAdmin):
     form = RunningLapForm
-    list_display = ('runnerId', 'customizedDate', 'numberOfLaps')
+    list_display = ('runnerId', 'startCustomizedDate', 'endCustomizedDate', 'numberOfLaps')
     ordering = ('endLapDate', 'numberOfLaps', 'runnerId')
     list_filter = ('runnerId', 'endLapDate', 'numberOfLaps')
     search_fields = ('runnerId', 'endLapDate', 'numberOfLaps')
 
-    exclude = ('numberOfLaps', 'endLapDate')
+    exclude = ('numberOfLaps', 'startLapDate', 'endLapDate')
     def save_model(self, request, obj, form, change):
         if form is not None:
+            startLapTime = form.cleaned_data.get('startLapTime')
+            if startLapTime >= time(21, 30):
+                obj.startLapDate = timezone.make_aware(datetime(2023, 10, 21, startLapTime.hour, startLapTime.minute))
+            else:
+                obj.startLapDate = timezone.make_aware(datetime(2023, 10, 22, startLapTime.hour, startLapTime.minute))
             endLapTime = form.cleaned_data.get('endLapTime')
-            if endLapTime > time(18, 0):
+            if endLapTime >= time(21, 30):
                 obj.endLapDate = timezone.make_aware(datetime(2023, 10, 21, endLapTime.hour, endLapTime.minute))
             else:
                 obj.endLapDate = timezone.make_aware(datetime(2023, 10, 22, endLapTime.hour, endLapTime.minute))
@@ -98,12 +112,18 @@ class RunningLapAdmin(admin.ModelAdmin):
             record.numberOfLaps += 1
             record.save()
 
-    def customizedDate(self, obj):
+    def startCustomizedDate(self, obj):
+        timezone.activate('Europe/Warsaw')
+        formatedDate = timezone.localtime(obj.startLapDate).strftime('%d października %H:%M')
+        timezone.deactivate()
+        return formatedDate
+    startCustomizedDate.short_description = 'Data rozpoczecia okrazenia biegu'
+    def endCustomizedDate(self, obj):
         timezone.activate('Europe/Warsaw')
         formatedDate = timezone.localtime(obj.endLapDate).strftime('%d października %H:%M')
         timezone.deactivate()
         return formatedDate
-    customizedDate.short_description = 'Data zakonczenia okrazenia biegu'
+    endCustomizedDate.short_description = 'Data zakonczenia okrazenia biegu'
     def countLap(self, runner_id, end_lap_date):
         query = Q(runnerId=runner_id, endLapDate__lt=end_lap_date)
         number = RunningLap.objects.filter(query).count() + 1
