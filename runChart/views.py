@@ -4,6 +4,8 @@ from .models import *
 from datetime import datetime, time
 from django.utils import timezone
 
+def xd(request):
+    return render(request, 'chart/xd.html')
 
 def index(request):
     return line_chart(request)
@@ -17,7 +19,6 @@ colors = ['rgb(255,51,51)', 'rgb(255,128,0)', 'rgb(255,255,0)', 'rgb(221,160,221
 
 def line_chart(request):
     time_strings = [dt.strftime('%H:%M') for dt in list(get_laps_for_every_time())]
-    print(time_strings)
     runners = []
     for runner in Runner.objects.all():
         stringRunner = str(runner)
@@ -37,13 +38,12 @@ def get_runners_laps_in_time():
     for i in range(Runner.objects.count()):
         result.append([])
     runningLaps = RunningLap.objects.all().order_by('endLapDate')
-
-    for runner in Runner.objects.all():
-        result[runner.id - 1].append({'x': '21:30', 'y': 0})
-
     warsaw_tz = pytz.timezone('Europe/Warsaw')
     for run in runningLaps:
         if run.runnerId != None:
+            start_lap_date_warsaw = run.startLapDate.astimezone(warsaw_tz)
+            result[run.runnerId.id - 1].append({'x': time(start_lap_date_warsaw.hour, start_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps-1})
+
             end_lap_date_warsaw = run.endLapDate.astimezone(warsaw_tz)
             result[run.runnerId.id - 1].append( {'x': time(end_lap_date_warsaw.hour, end_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps})
     return result
@@ -51,9 +51,9 @@ def get_runners_laps_in_time():
 
 import pytz
 def get_laps_for_every_time():
-    runningLapsDates = list(RunningLap.objects.values_list('endLapDate', flat=True).distinct().order_by('endLapDate'))
-    new_datetime = datetime(2023, 10, 21, 21, 30)
-    runningLapsDates.insert(0, new_datetime)
+    runningLapStartDates = list(RunningLap.objects.values_list('startLapDate', flat=True).distinct().order_by('startLapDate'))
+    runningLapEndDates = list(RunningLap.objects.values_list('endLapDate', flat=True).distinct().order_by('endLapDate'))
+    runningLapsDates = sorted(runningLapStartDates + runningLapEndDates)
     europe_warsaw = pytz.timezone('Europe/Warsaw')
     running_laps = [dt.astimezone(europe_warsaw) for dt in runningLapsDates]
     dict = {running_lap: [0] * Runner.objects.count() for running_lap in running_laps}
