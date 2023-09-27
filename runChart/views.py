@@ -1,12 +1,30 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.shortcuts import render
 from .models import *
 from datetime import datetime, time
-from django.utils import timezone
+import pytz
 
+from .forms import runTimeForm
+
+def resultTable(request):
+    return render(request, 'table/result.html')
+def customAdmin(request):
+    return render(request, 'admin/customAdmin.html')
 
 def xd(request):
-    return render(request, 'chart/xd.html')
+    if request.method == "POST":
+        form = runTimeForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name_input']
+            date = form.cleaned_data['date_input']
+            time = form.cleaned_data['time_input']
+
+            print("Name:", name)
+            print("Date:", date)
+            print("Time:", time)
+        else:
+            print("Form is not valid")
+    form = runTimeForm()
+    return render(request, 'chart/xd.html', {'form': form})
 
 def index(request):
     return line_chart(request)
@@ -21,11 +39,12 @@ colors = ['rgb(255,51,51)', 'rgb(255,128,0)', 'rgb(255,255,0)', 'rgb(221,160,221
 def line_chart(request):
     time_strings = [dt.strftime('%H:%M') for dt in list(get_laps_for_every_time())]
 
-    # runners = []
-    # for runner in Runner.objects.all():
-    #     stringRunner = str(runner)
-    #     runners.append(stringRunner)
-    runners = get_best_runners()
+    runners = []
+    for runner in Runner.objects.all():
+        stringRunner = str(runner)
+        runners.append(stringRunner)
+    #Wersja z posortowanymi biegaczami względem wyników
+    #runners = get_best_runners()
 
     runsData = get_runners_laps_in_time()
     context = {
@@ -58,18 +77,20 @@ def get_runners_laps_in_time():
 
     for run in runningLaps:
         if run.runnerId is not None:
-
-            runnerIndex = runners.index(run.runnerId.__str__())
-
             start_lap_date_warsaw = run.startLapDate.astimezone(warsaw_tz)
-            result[runnerIndex].append({'x': time(start_lap_date_warsaw.hour, start_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps-1})
-
+            result[run.runnerId.id-1].append({'x': time(start_lap_date_warsaw.hour, start_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps - 1})
             end_lap_date_warsaw = run.endLapDate.astimezone(warsaw_tz)
-            result[runnerIndex].append( {'x': time(end_lap_date_warsaw.hour, end_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps})
+            result[run.runnerId.id-1].append({'x': time(end_lap_date_warsaw.hour, end_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps})
+            # Wersja z posortowanymi biegaczami wzgledem wyników
+            # runnerIndex = runners.index(run.runnerId.__str__())
+            # start_lap_date_warsaw = run.startLapDate.astimezone(warsaw_tz)
+            # result[runnerIndex].append({'x': time(start_lap_date_warsaw.hour, start_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps-1})
+            # end_lap_date_warsaw = run.endLapDate.astimezone(warsaw_tz)
+            # result[runnerIndex].append({'x': time(end_lap_date_warsaw.hour, end_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps})
     return result
 
 
-import pytz
+
 def get_laps_for_every_time():
     runningLapStartDates = list(RunningLap.objects.values_list('startLapDate', flat=True).distinct().order_by('startLapDate'))
     runningLapEndDates = list(RunningLap.objects.values_list('endLapDate', flat=True).distinct().order_by('endLapDate'))

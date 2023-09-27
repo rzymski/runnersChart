@@ -1,97 +1,108 @@
 {% extends 'partials/base.html' %}
+{% block navbar_button %}
+    {{ block.super }}
+{% endblock %}
 
 {% block content %}
-    <div>
-        <div class="row mt-4">
-            <div class="col-md-11">
-                <div>
-                    <canvas id="myLineChart"></canvas>
-                </div>
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                <script>
-                    const runners = {{ runners|safe }};
-                    const labelTimes = {{labels|safe}};
-                    const colors = {{colors|safe}};
-                    const datasets = [];
-                    const runsData = {{ runsData|safe }};
+    <head>
+        <!-- chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+        <title>Wykres biegaczy</title>
+    </head>
+    <body>
+        <div>
+            <div class="row mt-4">
+                <div class="col-md-11">
+                    <div>
+                        <canvas id="myLineChart"></canvas>
+                    </div>
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                    <script>
+                        const runners = {{ runners|safe }};
+                        const labelTimes = {{labels|safe}};
+                        const colors = {{colors|safe}};
+                        const datasets = [];
+                        const runsData = {{ runsData|safe }};
 
-                    const flatLine = (ctx, value) => ctx.p0.parsed.y == ctx.p1.parsed.y ? value : undefined;
+                        const flatLine = (ctx, value) => ctx.p0.parsed.y == ctx.p1.parsed.y ? value : undefined;
 
-                    for(let i = 0; i < runners.length; i++){
-                        const backgroundColor = [colors[i % 30]];
-                        const borderColor = [colors[i % 30]]
-                        datasets.push({
-                            label: `${runners[i]}`,
-                            data: runsData[i],
-                            borderColor: borderColor,
-                            backgroundColor: backgroundColor,
-                            segment: {
-                                borderDash: ctx => flatLine(ctx, [4, 20]),
-                                label: ctx => flatLine(ctx, 'Super')
+                        for(let i = 0; i < runners.length; i++){
+                            const backgroundColor = [colors[i % 30]];
+                            const borderColor = [colors[i % 30]]
+                            datasets.push({
+                                label: `${runners[i]}`,
+                                data: runsData[i],
+                                borderColor: borderColor,
+                                backgroundColor: backgroundColor,
+                                segment: {
+                                    borderDash: ctx => flatLine(ctx, [4, 20]),
+                                    label: ctx => flatLine(ctx, 'Super')
+                                }
+                            });
+                        }
+
+                        const ctx = document.getElementById('myLineChart').getContext('2d');
+                        const myLineChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: labelTimes,
+                                datasets: datasets
+                            },
+                            options: {
+                                elements: {
+                                    point: {
+                                        radius: 5,
+                                    }
+                                },
+                                responsive: true,
+                                plugins: {
+                                    legend: {
+                                        title: {
+                                          display: true,
+                                          text: 'Biegacze'  ,
+                                        },
+                                        position: 'right',
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Wykres najlepszych biegaczy'
+                                    }
+                                },
+                                scales: {
+                                    x:{
+                                        title: {
+                                            display: true,
+                                            text: 'czas'
+                                        },
+                                    },
+                                    y: {
+                                        title: {
+                                            display: true,
+                                            text: 'Liczba okrążeń'
+                                        },
+                                        min: 0,
+                                        ticks: {
+                                            stepSize: 1
+                                        },
+                                        suggestedMax: 5,
+                                    }
+                                }
                             }
                         });
-                    }
 
-                    const ctx = document.getElementById('myLineChart').getContext('2d');
-                    const myLineChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: labelTimes,
-                            datasets: datasets
-                        },
-                        options: {
-                            elements: {
-                                point: {
-                                    radius: 5,
-                                }
-                            },
-                            responsive: true,
-                            plugins: {
-                                legend: {
-                                    title: {
-                                      display: true,
-                                      text: 'Biegacze'  ,
-                                    },
-                                    position: 'right',
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Wykres najlepszych biegaczy'
-                                }
-                            },
-                            scales: {
-                                x:{
-                                    title: {
-                                        display: true,
-                                        text: 'czas'
-                                    },
-                                },
-                                y: {
-                                    title: {
-                                        display: true,
-                                        text: 'Liczba okrążeń'
-                                    },
-                                    min: 0,
-                                    ticks: {
-                                        stepSize: 1
-                                    },
-                                    suggestedMax: 5,
-                                }
+                        let linesVisible = true;
+                        function showHideLines(){
+                            const datasets = myLineChart.data.datasets;
+                            for (let i = 0; i < datasets.length; i++) {
+                                datasets[i].hidden = linesVisible;
                             }
+                            myLineChart.update();
+                            linesVisible = !linesVisible;
                         }
-                    });
-
-                    let linesVisible = true;
-                    function showHideLines(){
-                        const datasets = myLineChart.data.datasets;
-                        for (let i = 0; i < datasets.length; i++) {
-                            datasets[i].hidden = linesVisible;
-                        }
-                        myLineChart.update();
-                        linesVisible = !linesVisible;
-                    }
-                </script>
+                    </script>
+                </div>
             </div>
         </div>
-    </div>
+    </body>
+
 {% endblock %}

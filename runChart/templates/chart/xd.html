@@ -1,12 +1,22 @@
-{% load static %}
-<html>
-    <head>
-        <link rel="stylesheet" type="text/css" href="{% static 'chart/myCSS.css' %}">
-        <title>XD</title>
-    </head>
-    <body>
-        <h1>
-            Hello World
-        </h1>
-    </body>
-</html>
+{% extends 'partials/base.html' %}
+{% block content %}
+    {% load static %}
+    <html>
+        <head>
+            <title>XD</title>
+            <script src="{% url 'js-catlog' %}"></script>
+            <script src="{% static '/admin/js/core.js' %}"></script>
+{#            <link rel="stylesheet" href="{% static 'admin/css/base.css' %}">#}
+            <link rel="stylesheet" href="{% static 'admin/css/widgets.css' %}">
+        </head>
+        <body>
+            <form method="post" style="align-items: center">
+                {% csrf_token %}
+                {{ form.media }}
+                {{ form.as_p }}
+                <input type="submit" name="submit" id="submit">
+            </form>
+        </body>
+    </html>
+
+{% endblock %}
