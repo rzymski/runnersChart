@@ -8,28 +8,50 @@
     <link rel="stylesheet" type="text/css" href="{% static 'userPages/base.css' %}">
     <!-- Favicon-->
     <link rel="shortcut icon" type="image/png" href="{% static 'userPages/img/forbidden_run_icon.png' %}">
-{#    <link rel="shortcut icon" href="{% static 'userPages/img/running_icon.ico' %}">#}
+    {#    <link rel="shortcut icon" href="{% static 'userPages/img/running_icon.ico' %}">#}
     <!-- Bootstrap 5-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <!-- FontAwesome -->
-{#    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css" integrity="sha512-q3eWabyZPc1XTCmF+8/LuE1ozpg5xxn7iO89yfSOd5/oKvyqLngoNGsx8jq92Y8eXJ/IRxQbEC+FGSYxtk2oiw==" crossorigin="anonymous" referrerpolicy="no-referrer" />#}
+    <!-- DataTables JS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css"></link>
 </head>
-<body>
+<body class="wrapper">
     <div class="myNavAndContent">
-        {% if request.path == '/chart/line/' or request.path == '/' %}
-            {% include 'partials/nav_with_button.html' %}
-        {% else %}
-            {% include 'partials/nav.html' %}
-        {% endif %}
-
-        {% block content %}
-        {% endblock %}
+        <header>
+            {% if request.path == '/chart/line/' or request.path == '/' %}
+                {% include 'partials/nav_with_button.html' %}
+            {% else %}
+                {% include 'partials/nav.html' %}
+            {% endif %}
+        </header>
+        <main>
+            {% block content %}
+            {% endblock %}
+        </main>
     </div>
-
     {% include 'partials/footer.html' %}
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <!-- JQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <!-- DataTables Script -->
+    <script>
+        $("#example").DataTable({
+            paging: false, //stronicowanie
+            pageLength: 50,
+            lengthChange: false, //change number of elements in page
+            autoWidth: true,
+            searching: true,
+            bInfo: false, //info about number of elements in page
+            bSort: true,
+        });
+
+        var newSearch = $("#example").DataTable();
+        $('#search').keyup(function(){
+            newSearch.search($(this).val()).draw();
+        })
+
+    </script>
 </body>
 </html>

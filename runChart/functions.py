@@ -1,14 +1,25 @@
 from .models import *
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 import pytz
 from django.db.models import Max, F
 
 
 def get_runner_actual_laps_and_status():
     result = []
+    lastRuns = []
     max_laps_per_runner = RunningLap.objects.values('runnerId').annotate(numberOfLaps=Max('numberOfLaps'))
     for m in max_laps_per_runner:
-        result.append(RunningLap.objects.filter(runnerId=m['runnerId'], numberOfLaps=m['numberOfLaps']).first())
+        lastRuns.append(RunningLap.objects.filter(runnerId=m['runnerId'], numberOfLaps=m['numberOfLaps']).first())
+    for lastRun in lastRuns:
+        status = 'BIEGNIE' if lastRun.endLapDate is None else 'ODPOCZYWA'
+        if status == 'BIEGNIE':
+            startLapDateDatetime = datetime(lastRun.startLapDate.year, lastRun.startLapDate.month, lastRun.startLapDate.day, lastRun.startLapDate.hour, lastRun.startLapDate.minute)
+            startLapDateDatetime += timedelta(hours=2)
+            #timeDelta = datetime(2023, 10, 22, 9, 30) - startLapDateDatetime
+            timeDelta = datetime.now() - startLapDateDatetime
+            result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps-1, str(timeDelta), status])
+        else:
+            result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps, '_______________', status])
     return result
 
 def get_best_runners():
@@ -50,9 +61,6 @@ def get_laps_for_every_time():
     runningLapEndDatesWithNones = list(RunningLap.objects.values_list('endLapDate', flat=True).distinct().order_by('endLapDate'))
     runningLapEndDates = list(filter(lambda x: x is not None, runningLapEndDatesWithNones))
     runningLapsDates = sorted(runningLapStartDates + runningLapEndDates)
-
-    print(len(runningLapsDates))
-
     europe_warsaw = pytz.timezone('Europe/Warsaw')
     running_laps = [dt.astimezone(europe_warsaw) for dt in runningLapsDates]
     dict = {running_lap: [0] * Runner.objects.count() for running_lap in running_laps}

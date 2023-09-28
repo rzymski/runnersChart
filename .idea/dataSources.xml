@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="db" uuid="33f1a8a8-f21f-476c-8ac1-52f81d24b297">
+    <data-source source="LOCAL" name="RunChart_database" uuid="de1b2543-7816-4cc7-999f-b9ad1f8a9b07">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/runProject/settings.py</remarks>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:D:\zapisy_programow_python\runProject\db.sqlite3</jdbc-url>
+      <jdbc-url>jdbc:sqlite:D:\zapisy_programow_python\runnersChart\db.sqlite3</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
-      <libraries>
-        <library>
-          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.40.1/sqlite-jdbc-3.40.1.jar</url>
-        </library>
-      </libraries>
     </data-source>
   </component>
 </project>
