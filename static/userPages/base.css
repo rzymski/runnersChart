@@ -31,6 +31,7 @@ footer{
     right: 0;
 }
 
+/* datable pagination */
 .page-item.active .page-link {
     columns: #fff;
     background-color: #6c757d;
@@ -51,6 +52,17 @@ footer{
 }
 
 .dataTables_filter{
-    margin-bottom: 20px !important;
+    /*margin-bottom: 20px !important;*/
     display: none;
 }
+
+.dataTables_length{
+    float: right !important;
+}
+
+/*CSS do przycisków kopiuj, excel, drukuj, pdf */
+.dt-buttons{
+    margin-bottom: 5px !important;
+}
+
+

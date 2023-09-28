@@ -27,7 +27,6 @@ def upload_csvFileUniversal(request, model_name):
             values = line.strip().split(';')
             obj_dict = {}
             for header, value in zip(headers, values):
-                print(value)
                 if value.lower() == 'none' or value.lower() == 'null' or value.lower() == '':
                     obj_dict[header] = None
                 elif header == "runnerId":
