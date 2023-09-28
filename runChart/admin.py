@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from .models import *
 from django.shortcuts import render, redirect
-from datetime import time, datetime
+from datetime import time, datetime, timedelta
 from django.utils import timezone
 from django.db.models import Q
 #Admin
@@ -81,7 +81,7 @@ class RunningLapForm(forms.ModelForm):
         fields = '__all__'
 
     startLapTime = forms.TimeField(widget=widgets.AdminTimeWidget, label="Czas rozpoczecia okrazenia")
-    endLapTime = forms.TimeField(widget=widgets.AdminTimeWidget, label="Czas zakonczenia okrazenia")
+    endLapTime = forms.TimeField(widget=widgets.AdminTimeWidget, label="Czas zakonczenia okrazenia", required=False)
 
 @admin.register(RunningLap)
 class RunningLapAdmin(admin.ModelAdmin):
@@ -90,8 +90,48 @@ class RunningLapAdmin(admin.ModelAdmin):
     ordering = ('endLapDate', 'numberOfLaps', 'runnerId')
     list_filter = ('runnerId', 'endLapDate', 'numberOfLaps')
     search_fields = ('runnerId', 'endLapDate', 'numberOfLaps')
-
     exclude = ('numberOfLaps', 'startLapDate', 'endLapDate')
+    def delete_view(self, request, object_id, extra_context=None):
+        if request.method == "POST":
+            obj = self.get_object(request, object_id)
+            runsAfter = RunningLap.objects.filter(
+                runnerId=obj.runnerId,
+                startLapDate__gt=obj.startLapDate)
+            for run in runsAfter:
+                run.numberOfLaps -= 1
+                run.save()
+            print(runsAfter)
+        return super().delete_view(request, object_id, extra_context)
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        if request.method == "POST":
+            obj = self.get_object(request, object_id)
+            runsAfter = RunningLap.objects.filter(
+                runnerId=obj.runnerId,
+                startLapDate__gt=obj.startLapDate)
+            for run in runsAfter:
+                run.numberOfLaps -= 1
+                run.save()
+        return super().change_view(request, object_id, form_url, extra_context)
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if obj is not None and obj.endLapDate is not None:
+            t = time(obj.endLapDate.hour, obj.endLapDate.minute)
+            dt = datetime.combine(datetime.today(), t)
+            dt += timedelta(hours=2)
+        endLapTimeValue = dt.time() if obj is not None and obj.endLapDate is not None else time(datetime.now().hour, datetime.now().minute, datetime.now().second)
+        if obj is not None and obj.startLapDate is not None:
+            t2 = time(obj.startLapDate.hour, obj.startLapDate.minute)
+            dt2 = datetime.combine(datetime.today(), t2)
+            dt2 += timedelta(hours=2)
+        startLapTimeValue = dt2.time() if obj is not None and obj.startLapDate is not None else time(datetime.now().hour, datetime.now().minute, datetime.now().second)
+        recommended_values = {
+            'startLapTime': startLapTimeValue,
+            'endLapTime': endLapTimeValue,
+        }
+        for field_name, recommended_value in recommended_values.items():
+            form.base_fields[field_name].widget.attrs['value'] = recommended_value
+        return form
+
     def save_model(self, request, obj, form, change):
         if form is not None:
             startLapTime = form.cleaned_data.get('startLapTime')
@@ -100,17 +140,21 @@ class RunningLapAdmin(admin.ModelAdmin):
             else:
                 obj.startLapDate = timezone.make_aware(datetime(2023, 10, 22, startLapTime.hour, startLapTime.minute))
             endLapTime = form.cleaned_data.get('endLapTime')
-            if endLapTime >= time(21, 30):
-                obj.endLapDate = timezone.make_aware(datetime(2023, 10, 21, endLapTime.hour, endLapTime.minute))
+            if endLapTime is not None:
+                if endLapTime >= time(21, 30):
+                    obj.endLapDate = timezone.make_aware(datetime(2023, 10, 21, endLapTime.hour, endLapTime.minute))
+                else:
+                    obj.endLapDate = timezone.make_aware(datetime(2023, 10, 22, endLapTime.hour, endLapTime.minute))
             else:
-                obj.endLapDate = timezone.make_aware(datetime(2023, 10, 22, endLapTime.hour, endLapTime.minute))
-        obj.numberOfLaps = self.countLap(obj.runnerId, obj.endLapDate)
+                obj.endLapDate = None
         super().save_model(request, obj, form, change)
-        query = Q(runnerId=obj.runnerId, endLapDate__gt=obj.endLapDate)
+        query = Q(runnerId=obj.runnerId, startLapDate__gt=obj.startLapDate)
         records_after = RunningLap.objects.filter(query)
         for record in records_after:
             record.numberOfLaps += 1
             record.save()
+        obj.numberOfLaps = self.countLap(obj.runnerId, obj.startLapDate)
+        obj.save()
 
     def startCustomizedDate(self, obj):
         timezone.activate('Europe/Warsaw')
@@ -119,13 +163,16 @@ class RunningLapAdmin(admin.ModelAdmin):
         return formatedDate
     startCustomizedDate.short_description = 'Data rozpoczecia okrazenia biegu'
     def endCustomizedDate(self, obj):
+        if obj.endLapDate is None:
+            return '_________________________'
         timezone.activate('Europe/Warsaw')
         formatedDate = timezone.localtime(obj.endLapDate).strftime('%d października %H:%M')
         timezone.deactivate()
         return formatedDate
     endCustomizedDate.short_description = 'Data zakonczenia okrazenia biegu'
-    def countLap(self, runner_id, end_lap_date):
-        query = Q(runnerId=runner_id, endLapDate__lt=end_lap_date)
+
+    def countLap(self, runner_id, start_lap_date):
+        query = Q(runnerId=runner_id, startLapDate__lt=start_lap_date)
         number = RunningLap.objects.filter(query).count() + 1
         return number
 
