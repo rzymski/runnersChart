@@ -43,82 +43,201 @@
 
     <!-- DataTables Script -->
     <script>
-        $("#example").DataTable({
-            paging: true, //stronicowanie
-            pageLength: 50,
-            lengthChange: true, //change number of elements in page
-            autoWidth: true,
-            searching: true,
-            bInfo: false, //info about number of elements in page
-            bSort: true,
-            //BUTTONS
-            dom: 'lBfrtip',
-            buttons: [
-                { //COPY
-                    extend: 'copy',
-                    text: '<i class="fas fa-clone"></i>',
-                    className: 'btn btn-secondary',
-                    titleAttr: 'Kopiuj',
-                    exportOptions: { //kolumny, które ma zkopiować
-                        columns: [0, 1, 2, 3, 4]
-                    }
-                },
-                { //EXCEL
-                    extend: 'excel',
-                    text: '<i class="fas fa-file-excel"></i>',
-                    className: 'btn btn-secondary',
-                    titleAttr: 'Eksportuj do Excela',
-                    exportOptions: { //kolumny, które ma exportowac do excela
-                        columns: [0, 1, 2, 3, 4]
-                    }
-                },
-                { //PRINT
-                    extend: 'print',
-                    text: '<i class="fas fa-print"></i>',
-                    className: 'btn btn-secondary',
-                    titleAttr: 'Wydrukuj',
-                    exportOptions: { //kolumny, które ma wydrukować
-                        columns: [0, 1, 2, 3, 4]
-                    },
-                    //zmiana czcionki wydrukowanego textu
-                    {% comment %}customize: function ( win ){
-                        $(win.document.body).css('font-size', '10pt')
-                        $(win.document.body).find('table')
-                            .addClass('compact')
-                            .css('font-size', 'inherit');
-                    }{% endcomment %}
-                },
-                { //PDF
-                    extend: 'pdf',
-                    text: '<i class="fas fa-file-pdf"></i>',
-                    className: 'btn btn-secondary',
-                    titleAttr: 'PDF',
-                    exportOptions: { //kolumny, które ma exportowac do excela
-                        columns: [0, 1, 2, 3, 4]
-                    },
-                    //Wyśrodkowanie kolumn
-                    tableHeader: {
-                        alignment: 'center'
-                    },
-                    //Zmiana czcionki i położenia
-                    customize: function ( doc ){
-                        doc.styles.tableHeader.alignment = 'center';
-                        doc.styles.tableBodyOdd.alignment = 'center'; //wysrodkowanie szarych wierszy (nieparzystych)
-                        doc.styles.tableBodyEven.alignment = 'center'; //wysrodkowanie bialych wierszy (parzystych)
-                        {#doc.styles.tableHeader.fontSize = 7;#}
-                        {#doc.defaultStyle.fontSize = 6;#}
-                        //100% szerokosci tabeli
-                        doc.content[1].table.widths = Array(doc.content[1].table.body[1].length + 1).join('*').split('');
-                    }
-                },
-            ]
-        });
+       $(document).ready(function() {
+           $('#example thead tr')
+               .clone(true)
+               .addClass('filters')
+               .appendTo('#example thead');
 
-        var newSearch = $("#example").DataTable();
-        $('#search').keyup(function(){
-            newSearch.search($(this).val()).draw();
-        })
+           var table = $('#example').DataTable({
+               paging: true, //stronicowanie#}
+               pageLength: 50,
+               lengthChange: true, //change number of elements in page
+               autoWidth: false,
+               searching: true,
+               bInfo: false, //info about number of elements in page
+               bSort: true,
+               orderCellsTop: true,
 
+               initComplete: function() {
+                   var api = this.api();
+                   api.columns([0,1,2,3,4,5])
+                       .eq(0)
+                       .each(function(colIdx) {
+                            var cell = $('.filters th').eq(
+                                $(api.column(colIdx).header()).index()
+                            );
+                            var title = $(cell).text();
+                            $(cell).html('<input type="text" placeholder="' + title + '"/>');
+                            $(
+                                'input',
+                                $('.filters th').eq($(api.column(colIdx).header()).index())
+                            )
+                                .off('keyup change')
+                                .on('keyup change', function(e) {
+                                    e.stopPropagation();
+                                    $(this).attr('title', $(this).val());
+                                    var regexr = '({search})';
+                                    var curserPosition = this.selectionStart;
+                                    api
+                                        .column(colIdx)
+                                        .search(
+                                            this.value != ''
+                                                ? regexr.replace('{search}', '(((' + this.value + ')))')
+                                                : '',
+                                            this.value != '',
+                                            this.value == ''
+                                        )
+                                    .draw();
+
+                                $(this)
+                                    .focus()[0]
+                                    .setSelectionRange(curserPosition, curserPosition);
+                                });
+                        });
+               },
+
+               //BUTTONS
+                dom: 'lBfrtip',
+                buttons: [
+                    { //COPY
+                        extend: 'copy',
+                        text: '<i class="fas fa-clone"></i>',
+                        className: 'btn btn-secondary',
+                        titleAttr: 'Kopiuj',
+                        exportOptions: { //kolumny, które ma zkopiować
+                            columns: [0, 1, 2, 3, 4]
+                        }
+                    },
+                    { //EXCEL
+                        extend: 'excel',
+                        text: '<i class="fas fa-file-excel"></i>',
+                        className: 'btn btn-secondary',
+                        titleAttr: 'Eksportuj do Excela',
+                        exportOptions: { //kolumny, które ma exportowac do excela
+                            columns: [0, 1, 2, 3]
+                        }
+                    },
+                    { //PRINT
+                        extend: 'print',
+                        text: '<i class="fas fa-print"></i>',
+                        className: 'btn btn-secondary',
+                        titleAttr: 'Wydrukuj',
+                        exportOptions: { //kolumny, które ma wydrukować
+                            columns: [0, 1, 2, 3]
+                        },
+                        //zmiana czcionki wydrukowanego textu
+                        customize: function ( win ){
+                            $(win.document.body).css('font-size', '10pt')
+                            $(win.document.body).find('table')
+                                .addClass('compact')
+                                .css('font-size', 'inherit');
+                        }
+                    },
+                    { //PDF
+                        extend: 'pdf',
+                        text: '<i class="fas fa-file-pdf"></i>',
+                        className: 'btn btn-secondary',
+                        titleAttr: 'PDF',
+                        exportOptions: { //kolumny, które ma exportowac do excela
+                            columns: [0, 1, 2, 3, 4]
+                        },
+                        //Wyśrodkowanie kolumn
+                        tableHeader: {
+                            alignment: 'center'
+                        },
+                        //Zmiana czcionki i położenia
+                        customize: function ( doc ){
+                            doc.styles.tableHeader.alignment = 'center';
+                            doc.styles.tableBodyOdd.alignment = 'center'; //wysrodkowanie szarych wierszy (nieparzystych)
+                            doc.styles.tableBodyEven.alignment = 'center'; //wysrodkowanie bialych wierszy (parzystych)
+                            {#doc.styles.tableHeader.fontSize = 7;#}
+                            {#doc.defaultStyle.fontSize = 6;#}
+                            //100% szerokosci tabeli
+                            doc.content[1].table.widths = Array(doc.content[1].table.body[1].length + 1).join('*').split('');
+                        }
+                    },
+                ]
+           });
+           var newSearch = $("#example").DataTable();
+           $('#search').keyup(function(){
+               newSearch.search($(this).val()).draw();
+           })
+       });
     </script>
 </body>
 </html>
+
+{#paging: true, //stronicowanie#}
+{#            pageLength: 50,#}
+{#            lengthChange: true, //change number of elements in page#}
+{#            autoWidth: true,#}
+{#            searching: true,#}
+{#            bInfo: false, //info about number of elements in page#}
+{#            bSort: true,#}
+{#            //BUTTONS#}
+{#            dom: 'lBfrtip',#}
+{#            buttons: [#}
+{#                { //COPY#}
+{#                    extend: 'copy',#}
+{#                    text: '<i class="fas fa-clone"></i>',#}
+{#                    className: 'btn btn-secondary',#}
+{#                    titleAttr: 'Kopiuj',#}
+{#                    exportOptions: { //kolumny, które ma zkopiować#}
+{#                        columns: [0, 1, 2, 3, 4]#}
+{#                    }#}
+{#                },#}
+{#                { //EXCEL#}
+{#                    extend: 'excel',#}
+{#                    text: '<i class="fas fa-file-excel"></i>',#}
+{#                    className: 'btn btn-secondary',#}
+{#                    titleAttr: 'Eksportuj do Excela',#}
+{#                    exportOptions: { //kolumny, które ma exportowac do excela#}
+{#                        columns: [0, 1, 2, 3, 4]#}
+{#                    }#}
+{#                },#}
+{#                { //PRINT#}
+{#                    extend: 'print',#}
+{#                    text: '<i class="fas fa-print"></i>',#}
+{#                    className: 'btn btn-secondary',#}
+{#                    titleAttr: 'Wydrukuj',#}
+{#                    exportOptions: { //kolumny, które ma wydrukować#}
+{#                        columns: [0, 1, 2, 3, 4]#}
+{#                    },#}
+{#                    //zmiana czcionki wydrukowanego textu#}
+{#                    customize: function ( win ){#}
+{#                        $(win.document.body).css('font-size', '10pt')#}
+{#                        $(win.document.body).find('table')#}
+{#                            .addClass('compact')#}
+{#                            .css('font-size', 'inherit');#}
+{#                    }#}
+{#                },#}
+{#                { //PDF#}
+{#                    extend: 'pdf',#}
+{#                    text: '<i class="fas fa-file-pdf"></i>',#}
+{#                    className: 'btn btn-secondary',#}
+{#                    titleAttr: 'PDF',#}
+{#                    exportOptions: { //kolumny, które ma exportowac do excela#}
+{#                        columns: [0, 1, 2, 3, 4]#}
+{#                    },#}
+{#                    //Wyśrodkowanie kolumn#}
+{#                    tableHeader: {#}
+{#                        alignment: 'center'#}
+{#                    },#}
+{#                    //Zmiana czcionki i położenia#}
+{#                    customize: function ( doc ){#}
+{#                        doc.styles.tableHeader.alignment = 'center';#}
+{#                        doc.styles.tableBodyOdd.alignment = 'center'; //wysrodkowanie szarych wierszy (nieparzystych)#}
+{#                        doc.styles.tableBodyEven.alignment = 'center'; //wysrodkowanie bialych wierszy (parzystych)#}
+{#                        doc.styles.tableHeader.fontSize = 7;#}
+{#                        doc.defaultStyle.fontSize = 6;#}
+{#                        //100% szerokosci tabeli#}
+{#                        doc.content[1].table.widths = Array(doc.content[1].table.body[1].length + 1).join('*').split('');#}
+{#                    }#}
+{#                },#}
+{#            ]#}
+
+{#var newSearch = $("#example").DataTable();#}
+{#        $('#search').keyup(function(){#}
+{#            newSearch.search($(this).val()).draw();#}
+{#        })#}

@@ -65,4 +65,8 @@ footer{
     margin-bottom: 5px !important;
 }
 
+thead input {
+    width: 100%;
+    text-align: center;
+}
 
