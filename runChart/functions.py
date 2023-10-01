@@ -2,14 +2,11 @@ from .models import *
 from datetime import datetime, time, timedelta
 import pytz
 from django.db.models import Max, F
-
+from django.utils import timezone
 
 def get_runner_actual_laps_and_status():
     result = []
-    lastRuns = []
-    max_laps_per_runner = RunningLap.objects.values('runnerId').annotate(numberOfLaps=Max('numberOfLaps'))
-    for m in max_laps_per_runner:
-        lastRuns.append(RunningLap.objects.filter(runnerId=m['runnerId'], numberOfLaps=m['numberOfLaps']).first())
+    lastRuns = get_last_run_for_every_runner(False)
     for lastRun in lastRuns:
         status = 'BIEGNIE' if lastRun.endLapDate is None else 'ODPOCZYWA'
         if status == 'BIEGNIE':
@@ -21,6 +18,79 @@ def get_runner_actual_laps_and_status():
         else:
             result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps, '_______________', status])
     return result
+
+def get_runner_laps_and_records():
+    result = []
+    lastRuns = get_last_run_for_every_runner(True)
+    lastRuns = sorted(lastRuns, key=lambda run: (-run.numberOfLaps, str(run.endLapDate)))
+    for rank, lastRun in enumerate(lastRuns):
+        shortestTime = get_best_time_for_runner(lastRun.runnerId)
+        longestTime = get_longest_run_without_breaks_for_runner(lastRun.runnerId)
+        if lastRun.endLapDate is None:
+            result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, rank+1, lastRun.numberOfLaps - 1, shortestTime, longestTime])
+        else:
+            result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, rank+1, lastRun.numberOfLaps, shortestTime, longestTime])
+    return result
+
+def get_actual_ranking(lastRuns):
+    ranking = []
+    print(lastRuns)
+    return ranking
+
+def get_longest_run_without_breaks_for_runner(runnerId):
+    runs = RunningLap.objects.filter(runnerId=runnerId).order_by('startLapDate')
+    longest_time = timedelta(0)
+    current_time = timedelta(0)
+    previous_run_end = None
+    for run in runs:
+        if previous_run_end is None:
+            previous_run_end = run.startLapDate
+        if previous_run_end.hour == run.startLapDate.hour and previous_run_end.minute == run.startLapDate.minute and run.endLapDate is not None:
+            # print(f"{previous_run_end} {run.startLapDate}")
+            current_time += run.endLapDate - run.startLapDate
+        elif previous_run_end != run.startLapDate and run.endLapDate is not None:
+            # print(f"KURWA {previous_run_end} {run.startLapDate}")
+            current_time = run.endLapDate - run.startLapDate
+        else:
+            break
+        if current_time > longest_time:
+            longest_time = current_time
+        previous_run_end = run.endLapDate
+    return longest_time
+
+    # runs = RunningLap.objects.filter(runnerId=runnerId)
+    #
+    # longest_time = timedelta(0)
+    # time = timedelta(0)
+    # endLapTime = runs[0].startLapDate
+    # for run in runs:
+    #     if time > longest_time:
+    #         longest_time = time
+    #     if endLapTime == run.startLapDate and run.endLapDate is not None:
+    #         time += run.endLapDate - run.startLapDate
+    #         endLapTime = run.endLapDate
+    # return longest_time
+
+def get_best_time_for_runner(runnerId):
+    runs = RunningLap.objects.filter(runnerId=runnerId)
+    shortest_time = timedelta.max if runs else None
+    for run in runs:
+        time = run.endLapDate - run.startLapDate if run.endLapDate is not None else None
+        if time is not None and time < shortest_time:
+            shortest_time = time
+    if shortest_time == timedelta.max:
+        shortest_time = None
+    return shortest_time
+
+def get_last_run_for_every_runner(finished):
+    lastRuns = []
+    if finished:
+        max_laps_per_runner = RunningLap.objects.exclude(endLapDate=None).values('runnerId').annotate(numberOfLaps=Max('numberOfLaps'))
+    else:
+        max_laps_per_runner = RunningLap.objects.values('runnerId').annotate(numberOfLaps=Max('numberOfLaps'))
+    for m in max_laps_per_runner:
+        lastRuns.append(RunningLap.objects.filter(runnerId=m['runnerId'], numberOfLaps=m['numberOfLaps']).first())
+    return lastRuns
 
 def get_best_runners():
     bestRuns = []

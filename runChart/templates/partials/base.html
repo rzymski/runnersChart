@@ -12,8 +12,9 @@
     <!-- Bootstrap 5-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <!-- DataTables CSS -->
-    <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/jszip-3.10.1/dt-1.13.6/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/datatables.min.css" rel="stylesheet">
-{#    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css"></link>#}
+    <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/jszip-3.10.1/dt-1.13.6/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/sc-2.2.0/datatables.min.css" rel="stylesheet"> <!-- Third version with scroll -->
+{#    <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/jszip-3.10.1/dt-1.13.6/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/datatables.min.css" rel="stylesheet">#}  <!-- Second version with buttons -->
+{#    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css"></link>#} <!-- First version without buttons -->
 
 </head>
 <body class="wrapper">
@@ -35,209 +36,24 @@
     <!-- JQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <!-- DataTables JS -->
+    <!-- Third version with scroll -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/jszip-3.10.1/dt-1.13.6/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/datatables.min.js"></script>
+    <script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/jszip-3.10.1/dt-1.13.6/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/sc-2.2.0/datatables.min.js"></script>
+    <!-- Second version with buttons -->
+{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>#}
+{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>#}
+{#    <script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/jszip-3.10.1/dt-1.13.6/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/datatables.min.js"></script>#}
+    <!-- First version without buttons -->
 {#    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>#}
 {#    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>#}
-
     <!-- DataTables Script -->
-    <script>
-       $(document).ready(function() {
-           $('#example thead tr')
-               .clone(true)
-               .addClass('filters')
-               .appendTo('#example thead');
-
-           var table = $('#example').DataTable({
-               paging: true, //stronicowanie#}
-               pageLength: 50,
-               lengthChange: true, //change number of elements in page
-               autoWidth: false,
-               searching: true,
-               bInfo: false, //info about number of elements in page
-               bSort: true,
-               orderCellsTop: true,
-
-               initComplete: function() {
-                   var api = this.api();
-                   api.columns([0,1,2,3,4,5])
-                       .eq(0)
-                       .each(function(colIdx) {
-                            var cell = $('.filters th').eq(
-                                $(api.column(colIdx).header()).index()
-                            );
-                            var title = $(cell).text();
-                            $(cell).html('<input type="text" placeholder="' + title + '"/>');
-                            $(
-                                'input',
-                                $('.filters th').eq($(api.column(colIdx).header()).index())
-                            )
-                                .off('keyup change')
-                                .on('keyup change', function(e) {
-                                    e.stopPropagation();
-                                    $(this).attr('title', $(this).val());
-                                    var regexr = '({search})';
-                                    var curserPosition = this.selectionStart;
-                                    api
-                                        .column(colIdx)
-                                        .search(
-                                            this.value != ''
-                                                ? regexr.replace('{search}', '(((' + this.value + ')))')
-                                                : '',
-                                            this.value != '',
-                                            this.value == ''
-                                        )
-                                    .draw();
-
-                                $(this)
-                                    .focus()[0]
-                                    .setSelectionRange(curserPosition, curserPosition);
-                                });
-                        });
-               },
-
-               //BUTTONS
-                dom: 'lBfrtip',
-                buttons: [
-                    { //COPY
-                        extend: 'copy',
-                        text: '<i class="fas fa-clone"></i>',
-                        className: 'btn btn-secondary',
-                        titleAttr: 'Kopiuj',
-                        exportOptions: { //kolumny, które ma zkopiować
-                            columns: [0, 1, 2, 3, 4]
-                        }
-                    },
-                    { //EXCEL
-                        extend: 'excel',
-                        text: '<i class="fas fa-file-excel"></i>',
-                        className: 'btn btn-secondary',
-                        titleAttr: 'Eksportuj do Excela',
-                        exportOptions: { //kolumny, które ma exportowac do excela
-                            columns: [0, 1, 2, 3]
-                        }
-                    },
-                    { //PRINT
-                        extend: 'print',
-                        text: '<i class="fas fa-print"></i>',
-                        className: 'btn btn-secondary',
-                        titleAttr: 'Wydrukuj',
-                        exportOptions: { //kolumny, które ma wydrukować
-                            columns: [0, 1, 2, 3]
-                        },
-                        //zmiana czcionki wydrukowanego textu
-                        customize: function ( win ){
-                            $(win.document.body).css('font-size', '10pt')
-                            $(win.document.body).find('table')
-                                .addClass('compact')
-                                .css('font-size', 'inherit');
-                        }
-                    },
-                    { //PDF
-                        extend: 'pdf',
-                        text: '<i class="fas fa-file-pdf"></i>',
-                        className: 'btn btn-secondary',
-                        titleAttr: 'PDF',
-                        exportOptions: { //kolumny, które ma exportowac do excela
-                            columns: [0, 1, 2, 3, 4]
-                        },
-                        //Wyśrodkowanie kolumn
-                        tableHeader: {
-                            alignment: 'center'
-                        },
-                        //Zmiana czcionki i położenia
-                        customize: function ( doc ){
-                            doc.styles.tableHeader.alignment = 'center';
-                            doc.styles.tableBodyOdd.alignment = 'center'; //wysrodkowanie szarych wierszy (nieparzystych)
-                            doc.styles.tableBodyEven.alignment = 'center'; //wysrodkowanie bialych wierszy (parzystych)
-                            {#doc.styles.tableHeader.fontSize = 7;#}
-                            {#doc.defaultStyle.fontSize = 6;#}
-                            //100% szerokosci tabeli
-                            doc.content[1].table.widths = Array(doc.content[1].table.body[1].length + 1).join('*').split('');
-                        }
-                    },
-                ]
-           });
-           var newSearch = $("#example").DataTable();
-           $('#search').keyup(function(){
-               newSearch.search($(this).val()).draw();
-           })
-       });
-    </script>
+    {% block table_script %}
+        {% if table_script == 'tableUser' %}
+            {% include 'scripts/resultTable.html' %}
+        {% elif table_script == 'tableAdmin' %}
+            {% include 'scripts/customizeAdmin.html' %}
+        {% endif %}
+    {% endblock %}
 </body>
 </html>
-
-{#paging: true, //stronicowanie#}
-{#            pageLength: 50,#}
-{#            lengthChange: true, //change number of elements in page#}
-{#            autoWidth: true,#}
-{#            searching: true,#}
-{#            bInfo: false, //info about number of elements in page#}
-{#            bSort: true,#}
-{#            //BUTTONS#}
-{#            dom: 'lBfrtip',#}
-{#            buttons: [#}
-{#                { //COPY#}
-{#                    extend: 'copy',#}
-{#                    text: '<i class="fas fa-clone"></i>',#}
-{#                    className: 'btn btn-secondary',#}
-{#                    titleAttr: 'Kopiuj',#}
-{#                    exportOptions: { //kolumny, które ma zkopiować#}
-{#                        columns: [0, 1, 2, 3, 4]#}
-{#                    }#}
-{#                },#}
-{#                { //EXCEL#}
-{#                    extend: 'excel',#}
-{#                    text: '<i class="fas fa-file-excel"></i>',#}
-{#                    className: 'btn btn-secondary',#}
-{#                    titleAttr: 'Eksportuj do Excela',#}
-{#                    exportOptions: { //kolumny, które ma exportowac do excela#}
-{#                        columns: [0, 1, 2, 3, 4]#}
-{#                    }#}
-{#                },#}
-{#                { //PRINT#}
-{#                    extend: 'print',#}
-{#                    text: '<i class="fas fa-print"></i>',#}
-{#                    className: 'btn btn-secondary',#}
-{#                    titleAttr: 'Wydrukuj',#}
-{#                    exportOptions: { //kolumny, które ma wydrukować#}
-{#                        columns: [0, 1, 2, 3, 4]#}
-{#                    },#}
-{#                    //zmiana czcionki wydrukowanego textu#}
-{#                    customize: function ( win ){#}
-{#                        $(win.document.body).css('font-size', '10pt')#}
-{#                        $(win.document.body).find('table')#}
-{#                            .addClass('compact')#}
-{#                            .css('font-size', 'inherit');#}
-{#                    }#}
-{#                },#}
-{#                { //PDF#}
-{#                    extend: 'pdf',#}
-{#                    text: '<i class="fas fa-file-pdf"></i>',#}
-{#                    className: 'btn btn-secondary',#}
-{#                    titleAttr: 'PDF',#}
-{#                    exportOptions: { //kolumny, które ma exportowac do excela#}
-{#                        columns: [0, 1, 2, 3, 4]#}
-{#                    },#}
-{#                    //Wyśrodkowanie kolumn#}
-{#                    tableHeader: {#}
-{#                        alignment: 'center'#}
-{#                    },#}
-{#                    //Zmiana czcionki i położenia#}
-{#                    customize: function ( doc ){#}
-{#                        doc.styles.tableHeader.alignment = 'center';#}
-{#                        doc.styles.tableBodyOdd.alignment = 'center'; //wysrodkowanie szarych wierszy (nieparzystych)#}
-{#                        doc.styles.tableBodyEven.alignment = 'center'; //wysrodkowanie bialych wierszy (parzystych)#}
-{#                        doc.styles.tableHeader.fontSize = 7;#}
-{#                        doc.defaultStyle.fontSize = 6;#}
-{#                        //100% szerokosci tabeli#}
-{#                        doc.content[1].table.widths = Array(doc.content[1].table.body[1].length + 1).join('*').split('');#}
-{#                    }#}
-{#                },#}
-{#            ]#}
-
-{#var newSearch = $("#example").DataTable();#}
-{#        $('#search').keyup(function(){#}
-{#            newSearch.search($(this).val()).draw();#}
-{#        })#}

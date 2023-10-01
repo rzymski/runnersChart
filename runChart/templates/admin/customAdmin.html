@@ -1,10 +1,38 @@
 {% extends 'partials/base.html' %}
 
 {% block content %}
-    <head>
-        <title>Wlasny panel administracyjny</title>
-    </head>
-    <body>
-        <h1>Hello world</h1>
-    </body>
+    <div>
+        <head>
+            <title>Panel administratorski</title>
+        </head>
+        <body>
+            <div class="TableContainer">
+                <br>
+                <table class="table table-bordered" id="example" style="text-align: center;">
+                    <thead class="table-success">
+                        <tr>
+                            <th style="width: 10%;">ID</th>
+                            <th style="width: 15%;">Imie</th>
+                            <th style="width: 15%;">Nazwisko</th>
+                            <th style="width: 15%;">Liczba okrazen</th>
+                            <th style="width: 30%;">Czas rozpoczecia nastepnego okrazenia</th>
+                            <th style="width: 15%;">Aktualny stan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lastRun in lastRunsData %}
+                        <tr>
+                            <td>{{ lastRun.0 }}</td>
+                            <td>{{ lastRun.1 }}</td>
+                            <td>{{ lastRun.2 }}</td>
+                            <td>{{ lastRun.3 }}</td>
+                            <td>{{ lastRun.4 }}</td>
+                            <td>{{ lastRun.5 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </body>
+    </div>
 {% endblock %}

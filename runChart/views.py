@@ -7,12 +7,13 @@ from .forms import runTimeForm
 
 
 def resultTable(request):
-    lastRunsData = get_runner_actual_laps_and_status()
-    return render(request, 'table/result.html', {"lastRunsData": lastRunsData})
+    runsData = get_runner_laps_and_records()
+    return render(request, 'table/result.html', {"runsData": runsData, "table_script": 'tableUser'})
 
 
 def customAdmin(request):
-    return render(request, 'admin/customAdmin.html')
+    lastRunsData = get_runner_actual_laps_and_status()
+    return render(request, 'admin/customAdmin.html', {"lastRunsData": lastRunsData, "table_script": 'tableAdmin'})
 
 
 def xd(request):

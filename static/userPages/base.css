@@ -8,9 +8,11 @@ body, html {
 .myNavAndContent{
     max-width: 100%;
     overflow-x: hidden;
+    height: 97%;
+    /*margin-bottom: 50px;*/
 
-    height: 100%;
-    margin-bottom: 50px;
+    /*usuniecie scrolla pionowego*/
+    overflow: hidden;
 }
 
 
@@ -20,7 +22,7 @@ body, html {
 
 
 footer{
-    height: 60px;
+    height: 3%;
     margin: 0px;
     padding: 0px;
 
@@ -29,6 +31,15 @@ footer{
     bottom: 0;
     left: 0;
     right: 0;
+
+    display: flex;
+    align-items: center;
+}
+
+.TableContainer{
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* datable pagination */

@@ -6,33 +6,35 @@
             <title>Tabela wynikow</title>
         </head>
         <body>
-            <div class="container">
+{#            {% include 'partials/resultTable.html' %}#}
+            <div class="TableContainer">
                 <br>
                 <table class="table table-bordered" id="example" style="text-align: center;">
                     <thead class="table-success">
                         <tr>
-                            <th style="width: 10%;">ID</th>
+                            <th style="width: 5%;">ID</th>
                             <th style="width: 15%;">Imie</th>
-                            <th style="width: 15%;">Nazwisko</th>
-                            <th style="width: 15%;">Liczba okrazen</th>
-                            <th style="width: 30%;">Czas rozpoczecia nastepnego okrazenia</th>
-                            <th style="width: 15%;">Aktualny stan</th>
+                            <th style="width: 25%;">Nazwisko</th>
+                            <th style="width: 5%;">Ranking</th>
+                            <th style="width: 12%;">Liczba okrażeń</th>
+                            <th style="width: 18%;">Najszybsze okrazenie</th>
+                            <th style="width: 20%;">Najdłuższy bieg bez przerwy</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for lastRun in lastRunsData %}
+                        {% for run in runsData %}
                         <tr>
-                            <td>{{ lastRun.0 }}</td>
-                            <td>{{ lastRun.1 }}</td>
-                            <td>{{ lastRun.2 }}</td>
-                            <td>{{ lastRun.3 }}</td>
-                            <td>{{ lastRun.4 }}</td>
-                            <td>{{ lastRun.5 }}</td>
+                            <td>{{ run.0 }}</td>
+                            <td>{{ run.1 }}</td>
+                            <td>{{ run.2 }}</td>
+                            <td>{{ run.3 }}</td>
+                            <td>{{ run.4 }}</td>
+                            <td>{{ run.5 }}</td>
+                            <td>{{ run.6 }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                <br><br><br>
             </div>
         </body>
     </div>
