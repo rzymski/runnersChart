@@ -2,7 +2,6 @@ from .models import *
 from datetime import datetime, time, timedelta
 import pytz
 from django.db.models import Max, F
-from django.utils import timezone
 
 def get_runner_actual_laps_and_status():
     result = []
@@ -12,7 +11,6 @@ def get_runner_actual_laps_and_status():
         if status == 'BIEGNIE':
             startLapDateDatetime = datetime(lastRun.startLapDate.year, lastRun.startLapDate.month, lastRun.startLapDate.day, lastRun.startLapDate.hour, lastRun.startLapDate.minute)
             startLapDateDatetime += timedelta(hours=2)
-            #timeDelta = datetime(2023, 10, 22, 9, 30) - startLapDateDatetime
             timeDelta = datetime.now() - startLapDateDatetime
             result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps-1, str(timeDelta), status])
         else:
@@ -32,10 +30,10 @@ def get_runner_laps_and_records():
             result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, rank+1, lastRun.numberOfLaps, shortestTime, longestTime])
     return result
 
-def get_actual_ranking(lastRuns):
-    ranking = []
-    print(lastRuns)
-    return ranking
+def get_actual_ranking(run):
+    runs_before = RunningLap.objects.filter(endLapDate__lt=run.endLapDate, numberOfLaps=run.numberOfLaps)
+    distinct_runner_count = runs_before.values('runnerId').distinct().count()
+    return distinct_runner_count+1
 
 def get_longest_run_without_breaks_for_runner(runnerId):
     runs = RunningLap.objects.filter(runnerId=runnerId).order_by('startLapDate')

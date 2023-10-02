@@ -1,0 +1,35 @@
+{% extends 'partials/base.html' %}
+
+{% block content %}
+    <div>
+        <head>
+            <title>Wyniki {{ runner }}</title>
+        </head>
+        <body>
+        <div style="text-align: center; font-size: 24px; font-weight: bold; margin-top: 30px">Biegacz {{ runner.name }} {{ runner.surname }}</div>
+            <div class="TableContainer">
+                <br>
+                <table class="table table-bordered" id="example" style="text-align: center;">
+                    <thead class="table-success">
+                        <tr>
+                            <th style="width: 10%;">Nr okrazenia</th>
+                            <th style="width: 30%;">Czas rozpoczęcia</th>
+                            <th style="width: 30%;">Czas zakończenia</th>
+                            <th style="width: 30%;">Ranking po ukończeniu okrążenia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for run in runs %}
+                        <tr>
+                            <td>{{ run.0 }}</td>
+                            <td>{{ run.1 }}</td>
+                            <td>{{ run.2 }}</td>
+                            <td>{{ run.3 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </body>
+    </div>
+{% endblock %}

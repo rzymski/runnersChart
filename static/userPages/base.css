@@ -37,7 +37,7 @@ footer{
 }
 
 .TableContainer{
-    width: 90%;
+    width: 95%;
     margin-left: auto;
     margin-right: auto;
 }
@@ -75,6 +75,16 @@ footer{
 .dt-buttons{
     margin-bottom: 5px !important;
 }
+
+/*naglowki tabel bez sortowania sa bez napisow nie dziala*/
+/*.sorting_disabled{*/
+/*    color: transparent !important;*/
+/*}*/
+
+/*naglowki tabel bez sortowania sa bez napisow dziala ale do wszystkich tabel*/
+/*th:nth-child(7), th:nth-child(8){*/
+/*    border: none;*/
+/*}*/
 
 thead input {
     width: 100%;

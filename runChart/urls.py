@@ -11,5 +11,10 @@ urlpatterns = [
     path('jsi18n', JavaScriptCatalog.as_view(), name='js-catlog'),
 
     path('admin/customAdmin', views.customAdmin, name='customAdmin'),
-    path('table/result', views.resultTable, name='resultTable')
+    path('table/result', views.resultTable, name='resultTable'),
+
+
+    # path('admin/add', views.adminAddRecord, name='adminAddRecord'),
+
+    path('table/runnerResults/<str:runnerId>', views.runnerResults, name='runnerResults'),
 ]

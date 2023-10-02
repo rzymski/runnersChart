@@ -6,7 +6,6 @@
             <title>Tabela wynikow</title>
         </head>
         <body>
-{#            {% include 'partials/resultTable.html' %}#}
             <div class="TableContainer">
                 <br>
                 <table class="table table-bordered" id="example" style="text-align: center;">
@@ -23,7 +22,7 @@
                     </thead>
                     <tbody>
                         {% for run in runsData %}
-                        <tr>
+                        <tr class="clickable-row" data-href="{% url 'runnerResults' run.0 %}">
                             <td>{{ run.0 }}</td>
                             <td>{{ run.1 }}</td>
                             <td>{{ run.2 }}</td>
@@ -38,4 +37,17 @@
             </div>
         </body>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const rows = document.querySelectorAll(".clickable-row");
+            rows.forEach(function (row) {
+                row.addEventListener("click", function () {
+                    const url = row.getAttribute("data-href");
+                    window.location.href = url;
+                });
+            });
+        });
+    </script>
+
 {% endblock %}

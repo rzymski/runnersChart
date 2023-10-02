@@ -6,17 +6,78 @@
             <title>XD</title>
             <script src="{% url 'js-catlog' %}"></script>
             <script src="{% static '/admin/js/core.js' %}"></script>
-{#            <link rel="stylesheet" href="{% static 'admin/css/base.css' %}">#}
             <link rel="stylesheet" href="{% static 'admin/css/widgets.css' %}">
         </head>
         <body>
-            <form method="post" style="align-items: center">
+            <form method="post">
                 {% csrf_token %}
-                {{ form.media }}
-                {{ form.as_p }}
-                <input type="submit" name="submit" id="submit">
+                <div class="TableContainer">
+                    <table class="table table-bordered" id="xd" style="text-align: center;">
+                        <thead class="table-success">
+                            <tr>
+                                <th>Runner ID</th>
+                                <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in runner_ids %}
+                            <tr>
+                                <td>{{ i }}</td>
+                                <td>{{ formset.management_form }}
+                                    {{ formset.non_form_errors }}
+                                    {{ formset.form.name_input }}
+                                    <button type="submit">Submit</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </form>
         </body>
     </html>
-
 {% endblock %}
+
+{#{% extends 'partials/base.html' %}#}
+{#{% block content %}#}
+{#    {% load static %}#}
+{#    <html>#}
+{#        <head>#}
+{#            <title>XD</title>#}
+{#            <script src="{% url 'js-catlog' %}"></script>#}
+{#            <script src="{% static '/admin/js/core.js' %}"></script>#}
+{#            <link rel="stylesheet" href="{% static 'admin/css/widgets.css' %}">#}
+{#        </head>#}
+{#        <body>#}
+{#            <div class="TableContainer">#}
+{#                {{ formset.management_form }}#}
+{#                <table class="table table-bordered" id="xd" style="text-align: center;">#}
+{#                    <thead class="table-success">#}
+{#                        <tr>#}
+{#                            <th>ID</th>#}
+{#                            <th>time input with submission button</th>#}
+{#                        </tr>#}
+{#                    </thead>#}
+{#                    <tbody>#}
+{#                        {% for form in formset %}#}
+{#                        <tr>#}
+{#                            <td>"xd"</td>#}
+{#                            <td>#}
+{#                                {{ form }}#}
+{#                                <form method="post" style="align-items: center">#}
+{#                                    {% csrf_token %}#}
+{#                                    {{ form.media }}#}
+{#                                    {{ form.name_input }}#}
+{#                                    <button type="submit" name="submit" id="submit" class="btn btn-primary text-center rounded-circle" title="start">#}
+{#                                        <i class="fa-solid fa-play"></i>#}
+{#                                    </button>#}
+{#                                </form>#}
+{#                            </td>#}
+{#                        </tr>#}
+{#                        {% endfor %}#}
+{#                    </tbody>#}
+{#                </table>#}
+{#            </div>#}
+{#        </body>#}
+{#    </html>#}
+{#{% endblock %}#}

@@ -9,7 +9,7 @@
            paging: true, //stronicowanie
            pageLength: 50,
            lengthChange: false, //change number of elements in page
-           autoWidth: false,
+           autoWidth: true,
            searching: true,
            bInfo: false, //info about number of elements in page
            bSort: true,
@@ -17,6 +17,11 @@
            scrollY: '75vh',
            scrollCollapse: true, //zeby nie robilo durnych paskow przy zmniejszeniu tabeli przez filtrowanie
            scroller: true,
+
+           "columnDefs": [{
+               targets: [6, 7],
+               "orderable":false
+           }],
 
            initComplete: function() {
                var api = this.api();

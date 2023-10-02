@@ -1,9 +1,7 @@
 <script>
    $(document).ready(function() {
-       $('#example thead tr')
-           .clone(true)
-           .addClass('filters')
-           .appendTo('#example thead');
+       var runnerName = "{{ runner.name }}";
+       var runnerSurname = "{{ runner.surname }}";
 
        var table = $('#example').DataTable({
            paging: true, //stronicowanie
@@ -17,44 +15,6 @@
            scrollY: '75vh',
            scrollCollapse: true, //zeby nie robilo durnych paskow przy zmniejszeniu tabeli przez filtrowanie
            scroller: true,
-
-           initComplete: function() {
-               var api = this.api();
-               api.columns([0,1,2,3,4,5,6])
-                   .eq(0)
-                   .each(function(colIdx) {
-                        var cell = $('.filters th').eq(
-                            $(api.column(colIdx).header()).index()
-                        );
-                        var title = $(cell).text();
-                        $(cell).html('<input type="text" placeholder="' + title + '"/>');
-                        $(
-                            'input',
-                            $('.filters th').eq($(api.column(colIdx).header()).index())
-                        )
-                            .off('keyup change')
-                            .on('keyup change', function(e) {
-                                e.stopPropagation();
-                                $(this).attr('title', $(this).val());
-                                var regexr = '({search})';
-                                var curserPosition = this.selectionStart;
-                                api
-                                    .column(colIdx)
-                                    .search(
-                                        this.value != ''
-                                            ? regexr.replace('{search}', '(((' + this.value + ')))')
-                                            : '',
-                                        this.value != '',
-                                        this.value == ''
-                                    )
-                                .draw();
-
-                            $(this)
-                                .focus()[0]
-                                .setSelectionRange(curserPosition, curserPosition);
-                            });
-                    });
-           },
            //BUTTONS
             dom: 'lBfrtip',
             buttons: [
@@ -63,9 +23,9 @@
                     text: '<i class="fas fa-clone"></i>',
                     className: 'btn btn-secondary',
                     titleAttr: 'Kopiuj',
-                    title: 'Tabela wyników biegaczy',
+                    title: 'Wyniki: ' + runnerName + ' ' + runnerSurname,
                     exportOptions: { //kolumny, które ma zkopiować
-                        columns: [0, 1, 2, 3, 4, 5, 6]
+                        columns: [0, 1, 2, 3]
                     }
                 },
                 { //EXCEL
@@ -73,10 +33,10 @@
                     text: '<i class="fas fa-file-excel"></i>',
                     className: 'btn btn-secondary',
                     titleAttr: 'Eksportuj do Excela',
-                    title: 'Tabela wyników biegaczy',
-                    filename: 'runnersResult',
+                    title: 'Wyniki: ' + runnerName + ' ' + runnerSurname,
+                    filename: runnerName + runnerSurname + 'Result',
                     exportOptions: { //kolumny, które ma exportowac do excela
-                        columns: [0, 1, 2, 3, 4, 5, 6]
+                        columns: [0, 1, 2, 3]
                     }
                 },
                 { //PRINT
@@ -84,9 +44,9 @@
                     text: '<i class="fas fa-print"></i>',
                     className: 'btn btn-secondary',
                     titleAttr: 'Wydrukuj',
-                    title: 'Tabela wyników biegaczy',
+                    title: 'Wyniki: ' + runnerName + ' ' + runnerSurname,
                     exportOptions: { //kolumny, które ma wydrukować
-                        columns: [0, 1, 2, 3, 4, 5, 6]
+                        columns: [0, 1, 2, 3]
                     },
                     //zmiana czcionki wydrukowanego textu
                     customize: function ( win ){
@@ -103,7 +63,7 @@
                     titleAttr: 'PDF',
                     filename: 'runnersResult',
                     exportOptions: { //kolumny, które ma exportowac do excela
-                        columns: [0, 1, 2, 3, 4, 5, 6]
+                        columns: [0, 1, 2, 3]
                     },
                     //Wyśrodkowanie kolumn
                     tableHeader: {
@@ -111,7 +71,7 @@
                     },
                     //Zmiana czcionki i położenia
                     customize: function ( doc ){
-                        doc.content[0].text = 'Tabela wyników biegaczy';
+                        doc.content[0].text = 'Wyniki: ' + runnerName + ' ' + runnerSurname;
                         doc.styles.tableHeader.alignment = 'center';
                         doc.styles.tableBodyOdd.alignment = 'center'; //wysrodkowanie szarych wierszy (nieparzystych)
                         doc.styles.tableBodyEven.alignment = 'center'; //wysrodkowanie bialych wierszy (parzystych)
