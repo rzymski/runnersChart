@@ -9,31 +9,24 @@
             <link rel="stylesheet" href="{% static 'admin/css/widgets.css' %}">
         </head>
         <body>
-            <form method="post">
-                {% csrf_token %}
-                <div class="TableContainer">
-                    <table class="table table-bordered" id="xd" style="text-align: center;">
-                        <thead class="table-success">
-                            <tr>
-                                <th>Runner ID</th>
-                                <th>Name</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for i in runner_ids %}
-                            <tr>
-                                <td>{{ i }}</td>
-                                <td>{{ formset.management_form }}
-                                    {{ formset.non_form_errors }}
-                                    {{ formset.form.name_input }}
-                                    <button type="submit">Submit</button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </form>
+            <div>
+
+                {% for form in form_list %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <div>
+                            {{ form.int_field }}
+                            {{ form.name_field }}
+                            {{ form.time_input }}
+                            {% if forloop.first %}
+                                {{ form.media }}
+                            {% endif %}
+                            <button type="submit">Submit</button>
+                        </div>
+                    </form>
+                {% endfor %}
+
+            </div>
         </body>
     </html>
 {% endblock %}
@@ -49,35 +42,31 @@
 {#            <link rel="stylesheet" href="{% static 'admin/css/widgets.css' %}">#}
 {#        </head>#}
 {#        <body>#}
-{#            <div class="TableContainer">#}
-{#                {{ formset.management_form }}#}
-{#                <table class="table table-bordered" id="xd" style="text-align: center;">#}
-{#                    <thead class="table-success">#}
-{#                        <tr>#}
-{#                            <th>ID</th>#}
-{#                            <th>time input with submission button</th>#}
-{#                        </tr>#}
-{#                    </thead>#}
-{#                    <tbody>#}
-{#                        {% for form in formset %}#}
-{#                        <tr>#}
-{#                            <td>"xd"</td>#}
-{#                            <td>#}
-{#                                {{ form }}#}
-{#                                <form method="post" style="align-items: center">#}
-{#                                    {% csrf_token %}#}
-{#                                    {{ form.media }}#}
-{#                                    {{ form.name_input }}#}
-{#                                    <button type="submit" name="submit" id="submit" class="btn btn-primary text-center rounded-circle" title="start">#}
-{#                                        <i class="fa-solid fa-play"></i>#}
-{#                                    </button>#}
-{#                                </form>#}
-{#                            </td>#}
-{#                        </tr>#}
-{#                        {% endfor %}#}
-{#                    </tbody>#}
-{#                </table>#}
-{#            </div>#}
+{#            <form method="post">#}
+{#                {% csrf_token %}#}
+{#                <div class="TableContainer">#}
+{#                    <table class="table table-bordered" id="xd" style="text-align: center;">#}
+{#                        <thead class="table-success">#}
+{#                            <tr>#}
+{#                                <th>Runner ID</th>#}
+{#                                <th>Name</th>#}
+{#                            </tr>#}
+{#                        </thead>#}
+{#                        <tbody>#}
+{#                            {% for i in runner_ids %}#}
+{#                            <tr>#}
+{#                                <td>{{ i }}</td>#}
+{#                                <td>{{ formset.forloop.counter0.management_form }}#}
+{#                                    {{ formset.forloop.counter0.non_form_errors }}#}
+{#                                    {{ formset.forloop.counter0.form.name_input }}#}
+{#                                    <button type="submit">Submit</button>#}
+{#                                </td>#}
+{#                            </tr>#}
+{#                            {% endfor %}#}
+{#                        </tbody>#}
+{#                    </table>#}
+{#                </div>#}
+{#            </form>#}
 {#        </body>#}
 {#    </html>#}
 {#{% endblock %}#}

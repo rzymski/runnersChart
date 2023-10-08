@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import *
 from .functions import *
 from datetime import datetime, time, timedelta
@@ -37,53 +37,76 @@ def resultTable(request):
 from django.forms.models import formset_factory
 
 
-def xd(request):
-    runners = [1, 2, 3, 4, 5]
-    NameFormSet = formset_factory(nameForm, extra=len(runners))
+# def form(request):
+#     runners = [1, 2, 3, 4, 5]
+#
+#     MyFormSet = formset_factory(MyForm, extra=5)
+#     formset = MyFormSet()
+#
+#     context = {
+#         'runner_ids': runners,
+#         'formset': formset,
+#     }
+#
+#     return render(request, 'test/form.html', context)
+
+# def form(request):
+#     exampleList = [1, 2, 3, 4, 5]
+#     form = MyForm()
+#
+#     if request.method == 'POST':
+#         form = MyForm(request.POST)
+#         if form.is_valid():
+#             char_value = form.cleaned_data['char_field']
+#             time_value = form.cleaned_data['time_field']
+#             # Process the form data as needed
+#             print(f"{char_value} {time_value}")
+#         else:
+#             print(f"Nie dobrze ale cos przeslalo {form}")
+#
+#     context = {
+#         'exampleList': exampleList,
+#         'form': form,
+#     }
+#
+#     return render(request, 'test/form.html', context)
+
+# views.py
+from django.shortcuts import render
+
+def form(request):
+    exampleList = [1, 2, 3, 4, 5]
 
     if request.method == 'POST':
-        print("POST WYKONAL SIE")
-        formset = NameFormSet(request.POST, prefix='name')
-        if formset.is_valid():
-            print("FORM IS VALID")
-            for i, form in enumerate(formset):
-                runner_id = runners[i]
-                #name = form.cleaned_data['name_input']
-                print(form)
-        else:
-            print("FORM IS NOT VALID")
+        form = ExampleListForm(exampleList, request.POST)
+        if form.is_valid():
+            # Process the checked checkboxes
+            checked_items = [item for item in exampleList if form.cleaned_data.get(f'checkbox_{item}')]
+            print("Checked items:", checked_items)
+            # Do something with the checked items
+
     else:
-        formset = NameFormSet(prefix='name')
+        form = ExampleListForm(exampleList)
 
-    context = {
-        'runner_ids': runners,
-        'formset': formset,
-    }
-    return render(request, 'test/xd.html', context)
+    return render(request, 'test/form.html', {'form': form})
 
-# def xd(request):
-#     xd = [[0, 1], [1, 10], [2, 100], [3, 1000]]
-#
-#     TimeFormset = formset_factory(nameForm, extra=10)
-#     if request.method == "POST":
-#         formset = TimeFormset(request.POST, request.FILES)
-#         if formset.is_valid():
-#             print("FormSet is valid")
-#         else:
-#             print("FormSet is not valid")
-#     else:
-#         formset = TimeFormset()
-#     return render(request, "test/xd.html", {"formset": formset})
 
-    # if request.method == "POST":
-    #     print("Przeslano cos")
-        # form = timeForm(request.POST)
-        # if form.is_valid():
-        #     time = form.cleaned_data['time_input']
-        #     print(time)
-        # else:
-        #     print("Form is not valid")
-    #return render(request, 'test/xd.html', {"lastRunsData": xd, 'forms': forms})
+
+def xd(request):
+    form_list = [MyForm(prefix=str(i)) for i in range(5)]
+    if request.method == 'POST':
+        for form in form_list:
+            if f"{form.prefix}-name_field" in request.POST and f"{form.prefix}-int_field" in request.POST and f"{form.prefix}-time_input" in request.POST:
+                form = MyForm(request.POST, prefix=form.prefix)
+                if form.is_valid():
+                    name = form.cleaned_data['name_field']
+                    integer = form.cleaned_data['int_field']
+                    time = form.cleaned_data['time_input']
+                    print(f"Form Data for {form.prefix}: Name={name}, Integer={integer} time={time}")
+                else:
+                    print("NOT VALID")
+        return redirect('xd')
+    return render(request, 'test/xd.html', {'form_list': form_list})
 
 # def xd(request):
 #     if request.method == "POST":
