@@ -1,9 +1,37 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from .models import *
 from .functions import *
 from datetime import datetime, time, timedelta
 import pytz
 from .forms import *
+
+from django.contrib.auth.models import auth
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+
+def loginUser(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = auth.authenticate(username=username, password=password)
+        if user is not None:
+            auth.login(request, user)
+            print("OK ZALOGOWAL SIE")
+            if 'next' in request.POST:
+                return redirect(request.POST['next'])
+            return redirect('index')
+        else:
+            print("OK NIE ZALOGOWAL SIE")
+            messages.success(request, 'Invalid Username or Password')
+            return redirect('loginUser')
+    else:
+        print("GET login")
+        return render(request, "authenticate/login.html")
+
+def logout(request):
+    auth.logout(request)
+    return redirect('index')
 
 def runnerResults(request, runnerId):
     runner = Runner.objects.get(id=runnerId)
@@ -16,6 +44,8 @@ def runnerResults(request, runnerId):
         results.append([run.numberOfLaps, startDate.strftime('%H:%M'), endDate.strftime('%H:%M'), rank])
     return render(request, 'table/runnerResults.html', {'runner': runner, 'runs': results, "table_script": 'tableRunnerResults'})
 
+
+@login_required(login_url="loginUser")
 def customAdmin(request):
     lastRunsData = get_runner_actual_laps_and_status()
     for index, lastRun in enumerate(lastRunsData, 1):

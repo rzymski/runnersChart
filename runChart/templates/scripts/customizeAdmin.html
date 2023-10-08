@@ -5,9 +5,7 @@
            .addClass('filters')
            .appendTo('#example thead');
 
-       $('#example thead tr th:last')
-            .html('')
-            .addClass('filters');
+       $('#example thead tr.filters th:nth-last-child(2)').text('Pojedynczy start/stop');
 
        var table = $('#example').DataTable({
            paging: true, //stronicowanie
@@ -21,11 +19,6 @@
            scrollY: '75vh',
            scrollCollapse: true, //zeby nie robilo durnych paskow przy zmniejszeniu tabeli przez filtrowanie
            scroller: true,
-
-           "columnDefs": [{
-               targets: [6,],
-               "orderable":false
-           }],
 
            initComplete: function() {
                var api = this.api();

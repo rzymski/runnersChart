@@ -1,0 +1,39 @@
+{% extends 'partials/base.html' %}
+{% block content %}
+    <div class="page-content-container-column">
+        <form method="POST" class="form-container">
+            {% csrf_token %}
+            <div class="form-row">
+                <h1 class="form-title">Witaj ponownie!</h1>
+                <p class="form-subtitle">Zaloguj się, aby móc korzystać z serwisu jako administrator</p>
+            </div>
+
+            <div class="form-row">
+                <div class="form-row">
+                    {{ form.username }}
+                    <i class="fa-solid fa-user input-icon"></i>
+                </div>
+
+                <div class="form-row">
+                    {{ form.password }}
+                    <i class="fa-solid fa-key input-icon"></i>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <button class="button-primary hoverable-button" type="submit">
+                    <div class="button-hover-effect large">
+                    </div>
+                    <p>Zaloguj się</p>
+                </button>
+            </div>
+
+            {% if form.errors %}
+            <div>
+                <p class="error-message">Wprowadzono błędne dane</p>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+{% endblock %}
