@@ -16,7 +16,11 @@ def save_multiple_runningLaps(runnerIds, time_str):
             return "Nie właściwy format czasu"
     errorInformation = ""
     for runnerId in runnerIds:
-        error = try_save_runningLap(int(runnerId), timeValue)
+        lap = RunningLap.objects.filter(runnerId=int(runnerId)).latest('startLapDate')
+        if lap.endLapDate is None:
+            error = try_save_runningLap(int(runnerId), None, timeValue)
+        else:
+            error = try_save_runningLap(int(runnerId), timeValue, None)
         if error:
             errorInformation += error + " "
     return errorInformation
