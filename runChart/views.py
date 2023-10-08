@@ -41,7 +41,8 @@ def runnerResults(request, runnerId):
         rank = get_actual_ranking(run)
         startDate = run.startLapDate + timedelta(hours=2)
         endDate = run.endLapDate + timedelta(hours=2)
-        results.append([run.numberOfLaps, startDate.strftime('%H:%M'), endDate.strftime('%H:%M'), rank])
+        timeDelta = endDate - startDate
+        results.append([run.numberOfLaps, startDate.strftime('%H:%M'), endDate.strftime('%H:%M'), timeDelta, rank])
     return render(request, 'table/runnerResults.html', {'runner': runner, 'runs': results, "table_script": 'tableRunnerResults'})
 
 

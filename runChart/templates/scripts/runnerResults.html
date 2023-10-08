@@ -25,7 +25,7 @@
                     titleAttr: 'Kopiuj',
                     title: 'Wyniki: ' + runnerName + ' ' + runnerSurname,
                     exportOptions: { //kolumny, które ma zkopiować
-                        columns: [0, 1, 2, 3]
+                        columns: [0, 1, 2, 3, 4]
                     }
                 },
                 { //EXCEL
@@ -36,7 +36,7 @@
                     title: 'Wyniki: ' + runnerName + ' ' + runnerSurname,
                     filename: runnerName + runnerSurname + 'Result',
                     exportOptions: { //kolumny, które ma exportowac do excela
-                        columns: [0, 1, 2, 3]
+                        columns: [0, 1, 2, 3, 4]
                     }
                 },
                 { //PRINT
@@ -46,7 +46,7 @@
                     titleAttr: 'Wydrukuj',
                     title: 'Wyniki: ' + runnerName + ' ' + runnerSurname,
                     exportOptions: { //kolumny, które ma wydrukować
-                        columns: [0, 1, 2, 3]
+                        columns: [0, 1, 2, 3, 4]
                     },
                     //zmiana czcionki wydrukowanego textu
                     customize: function ( win ){
@@ -63,7 +63,7 @@
                     titleAttr: 'PDF',
                     filename: 'runnersResult',
                     exportOptions: { //kolumny, które ma exportowac do excela
-                        columns: [0, 1, 2, 3]
+                        columns: [0, 1, 2, 3, 4]
                     },
                     //Wyśrodkowanie kolumn
                     tableHeader: {
