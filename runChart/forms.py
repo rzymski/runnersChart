@@ -6,17 +6,8 @@ class timeForm(forms.Form):
     start_time_input = forms.TimeField(widget=AdminTimeWidget, required=False)
     end_time_input = forms.TimeField(widget=AdminTimeWidget, required=False)
 
-
-
-class MyForm(forms.Form):
-    # name_field = forms.CharField()
-    # int_field = forms.IntegerField()
-    time_input = forms.TimeField(widget=AdminTimeWidget, label="time")
-    # time_input = forms.TimeField()
-    # class Meta:
-    #     widgets = {
-    #         'time_input': widgets.AdminTimeWidget(format='%H:%M')
-    #     }
+class MyTimeForm(forms.Form):
+    time_input = forms.TimeField(widget=AdminTimeWidget, label="mainTime", required=False)
 
 # forms.py
 from django import forms

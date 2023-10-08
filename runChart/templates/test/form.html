@@ -1,124 +1,122 @@
-<!-- my_template.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Checkbox Table</title>
-</head>
-<body>
-        <span>OK</span>
-        <span>OK2</span>
+{% extends 'partials/base.html' %}
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_table }}
-        <button type="submit">Submit</button>
-    </form>
-</body>
-</html>
+{% block content %}
+    {% load static %}
+    <div>
+        <head>
+            <title>Panel administratorski</title>
+            <script src="{% url 'js-catlog' %}"></script>
+            <script src="{% static '/admin/js/core.js' %}"></script>
+            <link rel="stylesheet" href="{% static 'admin/css/widgets.css' %}">
+        </head>
+        <body>
+            <div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div style="width: 100%">
+                        <div style="float: right; padding-right: 5%">
+                            <span style="display: inline-block;">
+                                {{ mainTime.time_input }}
+                            </span>
+                            <button type="submit" name="checkBoxSubmit" id="checkBoxSubmit" class="btn btn-danger text-center" title="checkBox">
+                                <i class="fa-solid fa-person-running"></i>
+                                Rozpocznij/Zakoncz biegi
+                            </button>
+                        </div>
+                    </div>
+                    <div style="clear: both;"></div>
+                    <div class="TableContainer">
+                        <table class="table table-bordered" id="example" style="text-align: center;">
+                            <thead class="table-success">
+                                <tr>
+                                    <th style="width: 10%;">ID</th>
+                                    <th style="width: 10%;">Imie</th>
+                                    <th style="width: 15%;">Nazwisko</th>
+                                    <th style="width: 10%;">Liczba okrazen</th>
+                                    <th style="width: 15%;">Czas rozpoczecia okrazenia</th>
+                                    <th style="width: 15%;">Aktualny stan</th>
+                                    <th style="width: 20%;">Dodaj okrazenie</th>
+                                    <th style="width: 5%; color: transparent"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lastRun in lastRunsData %}
+                                <tr>
+                                    <td>{{ lastRun.0 }}</td>
+                                    <td>{{ lastRun.1 }}</td>
+                                    <td>{{ lastRun.2 }}</td>
+                                    <td>{{ lastRun.3 }}</td>
+                                    <td>{{ lastRun.4 }}</td>
+                                    <td>{{ lastRun.5 }}</td>
+                                    <td>
+                                        {% if lastRun.5 == 'ODPOCZYWA' %}
+                                            <form method="post" style="align-items: center">
+                                                {% csrf_token %}
+                                                {% if forloop.first %}
+                                                    {{ lastRun.6.media }}
+                                                {% endif %}
+                                                <div>
+                                                    <span style="display: inline-block;">
+                                                        {{ lastRun.6.start_time_input }}
+                                                        {{ lastRun.6.end_time_input.as_hidden }}
+                                                    </span>
+                                                    <button type="submit" name="singleInputSubmit" id="submit" class="btn btn-primary text-center rounded-circle" title="start">
+                                                        <i class="fa-solid fa-play"></i>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        {% elif lastRun.5 == 'BIEGNIE' %}
+                                            <form method="post" style="align-items: center">
+                                                {% csrf_token %}
+                                                {% if forloop.first %}
+                                                    {{ lastRun.6.media }}
+                                                {% endif %}
+                                                <div>
+                                                    <span style="display: inline-block;">
+                                                        {{ lastRun.6.start_time_input.as_hidden }}
+                                                        {{ lastRun.6.end_time_input }}
+                                                    </span>
+                                                    <button type="submit" name="singleInputSubmit" id="submit" class="btn btn-danger text-center" title="stop">
+                                                        <i class="fa-solid fa-stop"></i>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" name="selected_items" value="{{ forloop.counter }}">
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </body>
+    </div>
+{% endblock %}
 
+{#<form method="post">#}
+{#  {% csrf_token %}#}
+{#  <table>#}
+{#    <thead>#}
+{#      <tr>#}
+{#        <th>Index</th>#}
+{#        <th>Checkbox</th>#}
+{#      </tr>#}
+{#    </thead>#}
+{#    <tbody>#}
+{#      {% for i in items %}#}
+{#        <tr>#}
+{#          <td>{{ forloop.counter }}</td>#}
+{#          <td>#}
+{#            <input type="checkbox" name="selected_items" value="{{ forloop.counter }}">#}
+{#          </td>#}
+{#        </tr>#}
+{#      {% endfor %}#}
+{#    </tbody>#}
+{#  </table>#}
+{#  <input type="submit" value="Submit">#}
+{#</form>#}
 
-
-{#<!DOCTYPE html>#}
-{#<html>#}
-{#<head>#}
-{#    <title>My Form Example</title>#}
-{#</head>#}
-{#<body>#}
-{#    <form method="post">#}
-{#        {% csrf_token %}#}
-{#        <table>#}
-{#            <thead>#}
-{#                <tr>#}
-{#                    <th>Example</th>#}
-{#                    <th>Char Field</th>#}
-{#                    <th>Time Field</th>#}
-{#                    <th>Action</th>#}
-{#                </tr>#}
-{#            </thead>#}
-{#            <tbody>#}
-{#                {% for item in exampleList %}#}
-{#                <tr>#}
-{#                    <td>{{ item }}</td>#}
-{#                    <td>{{ form.char_field }}</td>#}
-{#                    <td>{{ form.time_field }}</td>#}
-{#                    <td><input type="submit" name="submit_{{ item }}" value="Submit"></td>#}
-{#                </tr>#}
-{#                {% endfor %}#}
-{#            </tbody>#}
-{#        </table>#}
-{#    </form>#}
-{#</body>#}
-{#</html>#}
-
-
-{#<!DOCTYPE html>#}
-{#<html>#}
-{#<head>#}
-{#    <title>My Form Example</title>#}
-{#</head>#}
-{#<body>#}
-{#    <form method="post">#}
-{#        {% csrf_token %}#}
-{#        <table>#}
-{#            <thead>#}
-{#                <tr>#}
-{#                    <th>Example</th>#}
-{#                    <th>Char Field</th>#}
-{#                    <th>Time Field</th>#}
-{#                </tr>#}
-{#            </thead>#}
-{#            <tbody>#}
-{#                {% for item in exampleList %}#}
-{#                <tr>#}
-{#                    <td>{{ item }}</td>#}
-{#                    <td>{{ form.char_field }}</td>#}
-{#                    <td>{{ form.time_field }}</td>#}
-{#                </tr>#}
-{#                {% endfor %}#}
-{#            </tbody>#}
-{#        </table>#}
-{#        <input type="submit" value="Submit">#}
-{#    </form>#}
-{#</body>#}
-{#</html>#}
-
-
-
-{#{% extends 'partials/base.html' %}#}
-{#{% block content %}#}
-{#    {% load static %}#}
-{#    <html>#}
-{#        <head>#}
-{#            <title>XD</title>#}
-{#            <script src="{% url 'js-catlog' %}"></script>#}
-{#            <script src="{% static '/admin/js/core.js' %}"></script>#}
-{#            <link rel="stylesheet" href="{% static 'admin/css/widgets.css' %}">#}
-{#        </head>#}
-{#        <body>#}
-{#            <form method="post">#}
-{#                {% csrf_token %}#}
-{#                <div class="TableContainer">#}
-{#                    <table class="table table-bordered" id="xd" style="text-align: center;">#}
-{#                        <thead class="table-success">#}
-{#                            <tr>#}
-{#                                <th> t</th>#}
-{#                                <th> d</th>#}
-{#                                <th> time</th>#}
-{#                            </tr>#}
-{#                        </thead>#}
-{#                        <tbody>#}
-{#                            <div>#}
-{#                                <form method="POST" enctype="multipart/form-data">#}
-{#                                    {% csrf_token %}#}
-{#                                    {{ formset.as_p }}#}
-{#                                    <input type="submit" value="Submit">#}
-{#                                </form>#}
-{#                            </div>#}
-{#                        </tbody>#}
-{#                    </table>#}
-{#                </div>#}
-{#            </form>#}
-{#        </body>#}
-{#    </html>#}
-{#{% endblock %}#}

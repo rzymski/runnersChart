@@ -4,7 +4,26 @@ import pytz
 from django.db.models import Max, F, Q
 from django.utils import timezone
 
+def save_multiple_runningLaps(runnerIds, time_str):
+    if time_str is None or time_str == '':
+        return "Nie podano czasu"
+    try:
+        timeValue = datetime.strptime(time_str, '%H:%M:%S').time()
+    except ValueError:
+        try:
+            timeValue = datetime.strptime(time_str, '%H:%M').time()
+        except ValueError:
+            return "Nie właściwy format czasu"
+    errorInformation = ""
+    for runnerId in runnerIds:
+        error = try_save_runningLap(int(runnerId), timeValue)
+        if error:
+            errorInformation += error + " "
+    return errorInformation
+
 def try_save_runningLap(runnerId, startTime=None, endTime=None):
+    if startTime and time(21, 00) > startTime > time(12, 30) or endTime and time(21, 00) > endTime > time(12, 30):
+        return "Podano zly czas. Wyscig nie trwa pomiedzy 12:30 i 21:00, bo to nocny bieg."
     runner = Runner.objects.get(pk=runnerId)
     errorInformation = None
     if startTime:
