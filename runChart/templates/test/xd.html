@@ -9,64 +9,39 @@
             <link rel="stylesheet" href="{% static 'admin/css/widgets.css' %}">
         </head>
         <body>
-            <div>
-
-                {% for form in form_list %}
-                    <form method="post">
-                        {% csrf_token %}
-                        <div>
-                            {{ form.int_field }}
-                            {{ form.name_field }}
-                            {{ form.time_input }}
-                            {% if forloop.first %}
-                                {{ form.media }}
-                            {% endif %}
-                            <button type="submit">Submit</button>
-                        </div>
-                    </form>
-                {% endfor %}
-
+            <div class="TableContainer">
+                <table class="table table-bordered" id="xd" style="text-align: center;">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Runner ID</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for form in form_list %}
+                            <tr>
+                                <td>
+                                    {{ form.prefix }}
+                                </td>
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <td>
+                                        <div>
+                                            <span style="display: inline-block;">
+                                                {{ form.time_input }}
+                                            </span>
+                                            <button type="submit">Submit</button>
+                                        </div>
+                                    </td>
+                                    {% if forloop.first %}
+                                        {{ form.media }}
+                                    {% endif %}
+                                </form>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </body>
     </html>
 {% endblock %}
-
-{#{% extends 'partials/base.html' %}#}
-{#{% block content %}#}
-{#    {% load static %}#}
-{#    <html>#}
-{#        <head>#}
-{#            <title>XD</title>#}
-{#            <script src="{% url 'js-catlog' %}"></script>#}
-{#            <script src="{% static '/admin/js/core.js' %}"></script>#}
-{#            <link rel="stylesheet" href="{% static 'admin/css/widgets.css' %}">#}
-{#        </head>#}
-{#        <body>#}
-{#            <form method="post">#}
-{#                {% csrf_token %}#}
-{#                <div class="TableContainer">#}
-{#                    <table class="table table-bordered" id="xd" style="text-align: center;">#}
-{#                        <thead class="table-success">#}
-{#                            <tr>#}
-{#                                <th>Runner ID</th>#}
-{#                                <th>Name</th>#}
-{#                            </tr>#}
-{#                        </thead>#}
-{#                        <tbody>#}
-{#                            {% for i in runner_ids %}#}
-{#                            <tr>#}
-{#                                <td>{{ i }}</td>#}
-{#                                <td>{{ formset.forloop.counter0.management_form }}#}
-{#                                    {{ formset.forloop.counter0.non_form_errors }}#}
-{#                                    {{ formset.forloop.counter0.form.name_input }}#}
-{#                                    <button type="submit">Submit</button>#}
-{#                                </td>#}
-{#                            </tr>#}
-{#                            {% endfor %}#}
-{#                        </tbody>#}
-{#                    </table>#}
-{#                </div>#}
-{#            </form>#}
-{#        </body>#}
-{#    </html>#}
-{#{% endblock %}#}

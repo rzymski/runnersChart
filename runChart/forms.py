@@ -1,21 +1,16 @@
 from django import forms
 from django.contrib.admin.widgets import AdminTimeWidget, AdminDateWidget, AdminSplitDateTime
 
-class runTimeForm(forms.Form):
-    name_input = forms.CharField(max_length=128)
-    int_input = forms.IntegerField(min_value=0, max_value=10)
-    date_input = forms.DateField(widget=AdminDateWidget, label="date")
-    time_input = forms.TimeField(widget=AdminTimeWidget, label="time")
 
-# class timeForm(forms.Form):
-    #time_input = forms.TimeField(widget=AdminTimeWidget, label="time")
-class nameForm(forms.Form):
-    name_input = forms.CharField(max_length=128)
+class timeForm(forms.Form):
+    start_time_input = forms.TimeField(widget=AdminTimeWidget, required=False)
+    end_time_input = forms.TimeField(widget=AdminTimeWidget, required=False)
+
 
 
 class MyForm(forms.Form):
-    name_field = forms.CharField()
-    int_field = forms.IntegerField()
+    # name_field = forms.CharField()
+    # int_field = forms.IntegerField()
     time_input = forms.TimeField(widget=AdminTimeWidget, label="time")
     # time_input = forms.TimeField()
     # class Meta:

@@ -16,23 +16,47 @@ def runnerResults(request, runnerId):
         results.append([run.numberOfLaps, startDate.strftime('%H:%M'), endDate.strftime('%H:%M'), rank])
     return render(request, 'table/runnerResults.html', {'runner': runner, 'runs': results, "table_script": 'tableRunnerResults'})
 
-# def adminAddRecord(request):
-#     if request.method == "POST":
-#     return render(request, 'admin/add.html')
-# def adminEditRecord(request):
-#     return render(request, 'admin/edit.html')
-# def adminDeleteRecord(request):
-#     return render(request, 'admin/add.html')
-
 def customAdmin(request):
-    print()
     lastRunsData = get_runner_actual_laps_and_status()
+    for index, lastRun in enumerate(lastRunsData, 1):
+        lastRun.append(timeForm(prefix=str(index)))
+    if request.method == 'POST':
+        for formInList in [sublist[6] for sublist in lastRunsData]:
+            if f"{formInList.prefix}-start_time_input" in request.POST and f"{formInList.prefix}-end_time_input" in request.POST:
+                form = timeForm(request.POST, prefix=formInList.prefix)
+                if form.is_valid():
+                    startTime = form.cleaned_data['start_time_input']
+                    endTime = form.cleaned_data['end_time_input']
+                    print(f"Form Data for prefix={form.prefix} startTime={startTime} endTime={endTime}")
+                    errorInformation = try_save_runningLap(form.prefix, startTime, endTime)
+                    print(errorInformation)
+                else:
+                    print("NOT VALID")
+        return redirect('customAdmin')
     return render(request, 'admin/customAdmin.html', {"lastRunsData": lastRunsData, "table_script": 'tableAdmin'})
 
 def resultTable(request):
     runsData = get_runner_laps_and_records()
     return render(request, 'table/result.html', {"runsData": runsData, "table_script": 'tableUser'})
 
+
+
+def xd(request):
+    form_list = [timeForm(prefix=str(i)) for i in range(5)]
+
+    print(form_list)
+
+    if request.method == 'POST':
+        for form in form_list:
+            if f"{form.prefix}-time_input" in request.POST:
+                form = MyForm(request.POST, prefix=form.prefix)
+                if form.is_valid():
+                    time = form.cleaned_data['time_input']
+                    print(f"Form Data for prefix={form.prefix} time={time}")
+                else:
+                    print("NOT VALID")
+        return redirect('xd')
+    return render(request, 'test/xd.html', {'form_list': form_list})
 
 from django.forms.models import formset_factory
 
@@ -89,40 +113,6 @@ def form(request):
         form = ExampleListForm(exampleList)
 
     return render(request, 'test/form.html', {'form': form})
-
-
-
-def xd(request):
-    form_list = [MyForm(prefix=str(i)) for i in range(5)]
-    if request.method == 'POST':
-        for form in form_list:
-            if f"{form.prefix}-name_field" in request.POST and f"{form.prefix}-int_field" in request.POST and f"{form.prefix}-time_input" in request.POST:
-                form = MyForm(request.POST, prefix=form.prefix)
-                if form.is_valid():
-                    name = form.cleaned_data['name_field']
-                    integer = form.cleaned_data['int_field']
-                    time = form.cleaned_data['time_input']
-                    print(f"Form Data for {form.prefix}: Name={name}, Integer={integer} time={time}")
-                else:
-                    print("NOT VALID")
-        return redirect('xd')
-    return render(request, 'test/xd.html', {'form_list': form_list})
-
-# def xd(request):
-#     if request.method == "POST":
-#         form = runTimeForm(request.POST)
-#         if form.is_valid():
-#             name = form.cleaned_data['name_input']
-#             date = form.cleaned_data['date_input']
-#             time = form.cleaned_data['time_input']
-#             print("Name:", name)
-#             print("Date:", date)
-#             print("Time:", time)
-#         else:
-#             print("Form is not valid")
-#     form = runTimeForm()
-#     return render(request, 'test/xd.html', {'form': form})
-
 
 def index(request):
     return line_chart(request)

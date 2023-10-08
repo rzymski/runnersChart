@@ -21,8 +21,8 @@
                             <th style="width: 10%;">Liczba okrazen</th>
                             <th style="width: 20%;">Czas rozpoczecia nastepnego okrazenia</th>
                             <th style="width: 15%;">Aktualny stan</th>
-                            <th style="width: 15%; color: transparent">Dodaj</th>
-                            <th style="width: 5%; color: transparent">C</th>
+                            <th style="width: 20%;">Dodaj okrazenie</th>
+{#                            <th style="width: 5%; color: transparent">C</th>#}
                         </tr>
                     </thead>
                     <tbody>
@@ -38,18 +38,36 @@
                                 {% if lastRun.5 == 'ODPOCZYWA' %}
                                     <form method="post" style="align-items: center">
                                         {% csrf_token %}
-                                        {{ form.media }}
-                                        {{ form.as_p }}
-                                        <button type="submit" name="submit" id="submit" class="btn btn-primary text-center rounded-circle" title="start">
-                                            <i class="fa-solid fa-play"></i>
-                                        </button>
+                                        {% if forloop.first %}
+                                            {{ lastRun.6.media }}
+                                        {% endif %}
+                                        <div>
+                                            <span style="display: inline-block;">
+                                                {{ lastRun.6.start_time_input }}
+                                                {{ lastRun.6.end_time_input.as_hidden }}
+                                            </span>
+                                            <button type="submit" name="submit" id="submit" class="btn btn-primary text-center rounded-circle" title="start">
+                                                <i class="fa-solid fa-play"></i>
+                                            </button>
+                                        </div>
                                     </form>
                                 {% elif lastRun.5 == 'BIEGNIE' %}
-                                    <a class="btn btn-danger text-center" title="stop"><i class="fa-solid fa-stop"></i></a>
+                                    <form method="post" style="align-items: center">
+                                        {% csrf_token %}
+                                        {% if forloop.first %}
+                                            {{ lastRun.6.media }}
+                                        {% endif %}
+                                        <div>
+                                            <span style="display: inline-block;">
+                                                {{ lastRun.6.start_time_input.as_hidden }}
+                                                {{ lastRun.6.end_time_input }}
+                                            </span>
+                                            <button type="submit" name="submit" id="submit" class="btn btn-danger text-center" title="stop">
+                                                <i class="fa-solid fa-stop"></i>
+                                            </button>
+                                        </div>
+                                    </form>
                                 {% endif %}
-                            </td>
-                            <td>
-                                <input type="checkbox" name="checkboxName" value="checkboxValue">
                             </td>
                         </tr>
                         {% endfor %}

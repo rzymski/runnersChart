@@ -1,7 +1,56 @@
 from .models import *
 from datetime import datetime, time, timedelta
 import pytz
-from django.db.models import Max, F
+from django.db.models import Max, F, Q
+from django.utils import timezone
+
+def try_save_runningLap(runnerId, startTime=None, endTime=None):
+    runner = Runner.objects.get(pk=runnerId)
+    errorInformation = None
+    if startTime:
+        errorInformation = save_running_lap(runner, startTime)
+    elif endTime:
+        lap = RunningLap.objects.filter(runnerId=runnerId).latest('startLapDate')
+        if endTime >= time(21, 30):
+            endLapDate = timezone.make_aware(
+                datetime(2023, 10, 21, endTime.hour, endTime.minute))
+        else:
+            endLapDate = timezone.make_aware(
+                datetime(2023, 10, 22, endTime.hour, endTime.minute))
+        if endLapDate >= lap.startLapDate:
+            lap.endLapDate = endLapDate
+            lap.save()
+        else:
+            errorInformation = "Podano zly czas. Zawodnik nie moze zakonczyc okrazenia przed jego rozpoczeciem"
+    else:
+        errorInformation = "Nie otrzymano ani czasu rozpoczecia ani zakonczenia"
+    return errorInformation if errorInformation is not None else None
+
+def save_running_lap(runner, start_lap_time, end_lap_time=None):
+    startLapDate = None
+    endLapDate = None
+    if start_lap_time >= time(21, 30):
+        startLapDate = timezone.make_aware(
+            datetime(2023, 10, 21, start_lap_time.hour, start_lap_time.minute))
+    else:
+        startLapDate = timezone.make_aware(
+            datetime(2023, 10, 22, start_lap_time.hour, start_lap_time.minute))
+    if end_lap_time is not None:
+        if end_lap_time >= time(21, 30):
+            endLapDate = timezone.make_aware(
+                datetime(2023, 10, 21, end_lap_time.hour, end_lap_time.minute))
+        else:
+            endLapDate = timezone.make_aware(
+                datetime(2023, 10, 22, end_lap_time.hour, end_lap_time.minute))
+    errorQuery = Q(runnerId=runner, endLapDate__gt=startLapDate)
+    numberOfErrorLaps = RunningLap.objects.filter(errorQuery).count()
+    if numberOfErrorLaps > 0:
+        return "Podano zly czas. Zawodnik nie moze zaczynac okrazenia przed zakonczeniem poprzedniego"
+    query = Q(runnerId=runner, startLapDate__lt=startLapDate)
+    numberOfLaps = RunningLap.objects.filter(query).count() + 1
+    new_running_lap = RunningLap(runnerId=runner, startLapDate=startLapDate, endLapDate=endLapDate, numberOfLaps=numberOfLaps)
+    new_running_lap.save()
+    return None
 
 def get_runner_actual_laps_and_status():
     result = []
@@ -55,19 +104,6 @@ def get_longest_run_without_breaks_for_runner(runnerId):
             longest_time = current_time
         previous_run_end = run.endLapDate
     return longest_time
-
-    # runs = RunningLap.objects.filter(runnerId=runnerId)
-    #
-    # longest_time = timedelta(0)
-    # time = timedelta(0)
-    # endLapTime = runs[0].startLapDate
-    # for run in runs:
-    #     if time > longest_time:
-    #         longest_time = time
-    #     if endLapTime == run.startLapDate and run.endLapDate is not None:
-    #         time += run.endLapDate - run.startLapDate
-    #         endLapTime = run.endLapDate
-    # return longest_time
 
 def get_best_time_for_runner(runnerId):
     runs = RunningLap.objects.filter(runnerId=runnerId)

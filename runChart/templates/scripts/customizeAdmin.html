@@ -5,11 +5,15 @@
            .addClass('filters')
            .appendTo('#example thead');
 
+       $('#example thead tr th:last')
+            .html('')
+            .addClass('filters');
+
        var table = $('#example').DataTable({
            paging: true, //stronicowanie
            pageLength: 50,
            lengthChange: false, //change number of elements in page
-           autoWidth: true,
+           autoWidth: false,
            searching: true,
            bInfo: false, //info about number of elements in page
            bSort: true,
@@ -19,7 +23,7 @@
            scroller: true,
 
            "columnDefs": [{
-               targets: [6, 7],
+               targets: [6,],
                "orderable":false
            }],
 
