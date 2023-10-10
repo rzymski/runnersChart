@@ -87,7 +87,7 @@ class RunningLapAdmin(admin.ModelAdmin):
     form = RunningLapForm
     list_display = ('runnerId', 'startCustomizedDate', 'endCustomizedDate', 'numberOfLaps')
     # list_display = ('runnerId', 'startLapDate', 'endLapDate', 'numberOfLaps')
-    ordering = ('endLapDate', 'startLapDate', 'numberOfLaps', 'runnerId')
+    ordering = ('startLapDate', 'endLapDate', 'numberOfLaps', 'runnerId')
     list_filter = ('runnerId', 'runnerId__name', 'runnerId__surname', 'startLapDate', 'endLapDate', 'numberOfLaps')
     # search_fields = ('runnerId__id', 'runnerId__name', 'runnerId__surname', 'startLapDate', 'endLapDate', 'numberOfLaps')
     search_fields = ('runnerId__id', 'runnerId__name', 'runnerId__surname', 'numberOfLaps')
