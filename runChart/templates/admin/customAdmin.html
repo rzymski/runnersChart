@@ -54,7 +54,13 @@
                                     <td>{{ lastRun.2 }}</td>
                                     <td>{{ lastRun.3 }}</td>
                                     <td>{{ lastRun.4 }}</td>
-                                    <td>{{ lastRun.5 }}</td>
+                                    {% if lastRun.5 == 'ODPOCZYWA' %}
+                                        <td style="color: blue">{{ lastRun.5 }}</td>
+                                    {% elif lastRun.5 == 'BIEGNIE' %}
+                                        <td style="color: red">{{ lastRun.5 }}</td>
+                                    {% else %}
+                                        <td>{{ lastRun.5 }}</td>
+                                    {% endif %}
                                     <td>
                                         {% if lastRun.5 == 'ODPOCZYWA' %}
                                             <form method="post" style="align-items: center">

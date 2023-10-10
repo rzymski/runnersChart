@@ -79,19 +79,19 @@ class RunningLapForm(forms.ModelForm):
     class Meta:
         model = RunningLap
         fields = '__all__'
-
     startLapTime = forms.TimeField(widget=widgets.AdminTimeWidget, label="Czas rozpoczecia okrazenia")
     endLapTime = forms.TimeField(widget=widgets.AdminTimeWidget, label="Czas zakonczenia okrazenia", required=False)
 
 @admin.register(RunningLap)
 class RunningLapAdmin(admin.ModelAdmin):
     form = RunningLapForm
-    # list_display = ('runnerId', 'startCustomizedDate', 'endCustomizedDate', 'numberOfLaps')
-    list_display = ('runnerId', 'startLapDate', 'endLapDate', 'numberOfLaps')
-    ordering = ('endLapDate', 'numberOfLaps', 'runnerId')
-    list_filter = ('runnerId', 'endLapDate', 'numberOfLaps')
-    search_fields = ('runnerId', 'endLapDate', 'numberOfLaps')
-    exclude = ('numberOfLaps', 'startLapDate', 'endLapDate')
+    list_display = ('runnerId', 'startCustomizedDate', 'endCustomizedDate', 'numberOfLaps')
+    # list_display = ('runnerId', 'startLapDate', 'endLapDate', 'numberOfLaps')
+    ordering = ('endLapDate', 'startLapDate', 'numberOfLaps', 'runnerId')
+    list_filter = ('runnerId', 'runnerId__name', 'runnerId__surname', 'startLapDate', 'endLapDate', 'numberOfLaps')
+    # search_fields = ('runnerId__id', 'runnerId__name', 'runnerId__surname', 'startLapDate', 'endLapDate', 'numberOfLaps')
+    search_fields = ('runnerId__id', 'runnerId__name', 'runnerId__surname', 'numberOfLaps')
+    exclude = ('numberOfLaps', 'startLapDate', 'endLapDate') #nie trzeba podawać przy dodawaniu nowego rekordu
     def delete_view(self, request, object_id, extra_context=None):
         if request.method == "POST":
             obj = self.get_object(request, object_id)
@@ -156,6 +156,33 @@ class RunningLapAdmin(admin.ModelAdmin):
             record.save()
         obj.numberOfLaps = self.countLap(obj.runnerId, obj.startLapDate)
         obj.save()
+
+    def get_search_results(self, request, queryset, search_term):
+        queryset, may_have_duplicates = super().get_search_results(
+            request,
+            queryset,
+            search_term,
+        )
+        if search_term != '':
+            print(queryset)
+            lapsWithDate = self.search_date(search_term)
+            lapsWithDate_queryset = RunningLap.objects.filter(pk__in=[lap.pk for lap in lapsWithDate])
+            print(lapsWithDate_queryset)
+            queryset |= lapsWithDate_queryset
+        return queryset, may_have_duplicates
+
+    def search_date(self, search_term):
+        laps = RunningLap.objects.all()
+        lapsWithDate = []
+        for lap in laps:
+            timezone.activate('Europe/Warsaw')
+            startD = timezone.localtime(lap.startLapDate)
+            if lap.endLapDate:
+                endD = timezone.localtime(lap.endLapDate)
+            if search_term in str(startD) or endD and search_term in str(endD):
+                lapsWithDate.append(lap)
+            timezone.deactivate()
+        return lapsWithDate
 
     def startCustomizedDate(self, obj):
         timezone.activate('Europe/Warsaw')
