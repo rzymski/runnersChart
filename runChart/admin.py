@@ -92,6 +92,25 @@ class RunningLapAdmin(admin.ModelAdmin):
     # search_fields = ('runnerId__id', 'runnerId__name', 'runnerId__surname', 'startLapDate', 'endLapDate', 'numberOfLaps')
     search_fields = ('runnerId__id', 'runnerId__name', 'runnerId__surname', 'numberOfLaps')
     exclude = ('numberOfLaps', 'startLapDate', 'endLapDate') #nie trzeba podawać przy dodawaniu nowego rekordu
+
+    def startCustomizedDate(self, obj):
+        timezone.activate('Europe/Warsaw')
+        formatedDate = timezone.localtime(obj.startLapDate).strftime('%d października %H:%M')
+        timezone.deactivate()
+        return formatedDate
+    startCustomizedDate.short_description = 'Czas rozpoczecia okrazenia'
+    def endCustomizedDate(self, obj):
+        if obj.endLapDate is None:
+            return '_________________________'
+        timezone.activate('Europe/Warsaw')
+        formatedDate = timezone.localtime(obj.endLapDate).strftime('%d października %H:%M')
+        timezone.deactivate()
+        return formatedDate
+    endCustomizedDate.short_description = 'Czas zakonczenia okrazenia'
+
+    startCustomizedDate.admin_order_field = 'startLapDate'
+    endCustomizedDate.admin_order_field = 'endLapDate'
+
     def delete_view(self, request, object_id, extra_context=None):
         if request.method == "POST":
             obj = self.get_object(request, object_id)
@@ -183,21 +202,6 @@ class RunningLapAdmin(admin.ModelAdmin):
                 lapsWithDate.append(lap)
             timezone.deactivate()
         return lapsWithDate
-
-    def startCustomizedDate(self, obj):
-        timezone.activate('Europe/Warsaw')
-        formatedDate = timezone.localtime(obj.startLapDate).strftime('%d października %H:%M')
-        timezone.deactivate()
-        return formatedDate
-    startCustomizedDate.short_description = 'Data rozpoczecia okrazenia biegu'
-    def endCustomizedDate(self, obj):
-        if obj.endLapDate is None:
-            return '_________________________'
-        timezone.activate('Europe/Warsaw')
-        formatedDate = timezone.localtime(obj.endLapDate).strftime('%d października %H:%M')
-        timezone.deactivate()
-        return formatedDate
-    endCustomizedDate.short_description = 'Data zakonczenia okrazenia biegu'
 
     def countLap(self, runner_id, start_lap_date):
         query = Q(runnerId=runner_id, startLapDate__lt=start_lap_date)
