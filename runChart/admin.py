@@ -61,6 +61,7 @@ def upload_csvFileUniversal(request, model_name):
 
 @admin.register(Runner)
 class RunnerAdmin(admin.ModelAdmin):
+    change_list_template = 'admin/runChart/Runner/change_list.html'
     list_display = ('id', 'name', 'surname')
     list_filter = ('id', 'name', 'surname')
     search_fields = ('id', 'name', 'surname')
@@ -84,6 +85,8 @@ class RunningLapForm(forms.ModelForm):
 
 @admin.register(RunningLap)
 class RunningLapAdmin(admin.ModelAdmin):
+    change_list_template = 'admin/runChart/RunningLap/change_list.html'
+
     form = RunningLapForm
     list_display = ('runnerId', 'startCustomizedDate', 'endCustomizedDate', 'numberOfLaps')
     # list_display = ('runnerId', 'startLapDate', 'endLapDate', 'numberOfLaps')
