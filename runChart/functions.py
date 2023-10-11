@@ -14,7 +14,8 @@ def save_multiple_runningLaps(runnerIds, time_str):
             timeValue = datetime.strptime(time_str, '%H:%M').time()
         except ValueError:
             return "Nie właściwy format czasu"
-    errorInformation = ""
+    errorInformation = []
+
     for runnerId in runnerIds:
         lap = RunningLap.objects.filter(runnerId=int(runnerId)).latest('startLapDate')
         if lap.endLapDate is None:
@@ -22,12 +23,13 @@ def save_multiple_runningLaps(runnerIds, time_str):
         else:
             error = try_save_runningLap(int(runnerId), timeValue, None)
         if error:
-            errorInformation += error + " "
+            errorInformation.append(error)
     return errorInformation
 
 def try_save_runningLap(runnerId, startTime=None, endTime=None):
+    errorTime = startTime if startTime is not None else endTime
     if startTime and time(21, 00) > startTime > time(12, 30) or endTime and time(21, 00) > endTime > time(12, 30):
-        return "Podano zly czas. Wyscig nie trwa pomiedzy 12:30 i 21:00, bo to nocny bieg."
+        return f"Podano zly czas {errorTime}. Wyscig nie trwa pomiedzy 12:30 i 21:00, bo to nocny bieg."
     runner = Runner.objects.get(pk=runnerId)
     errorInformation = None
     if startTime:
@@ -44,7 +46,7 @@ def try_save_runningLap(runnerId, startTime=None, endTime=None):
             lap.endLapDate = endLapDate
             lap.save()
         else:
-            errorInformation = "Podano zly czas. Zawodnik nie moze zakonczyc okrazenia przed jego rozpoczeciem"
+            errorInformation = f"Podano zly czas {errorTime}. Zawodnik {runner} nie moze zakonczyc okrazenia przed jego rozpoczeciem"
     else:
         errorInformation = "Nie otrzymano ani czasu rozpoczecia ani zakonczenia"
     return errorInformation if errorInformation is not None else None
@@ -68,7 +70,7 @@ def save_running_lap(runner, start_lap_time, end_lap_time=None):
     errorQuery = Q(runnerId=runner, endLapDate__gt=startLapDate)
     numberOfErrorLaps = RunningLap.objects.filter(errorQuery).count()
     if numberOfErrorLaps > 0:
-        return "Podano zly czas. Zawodnik nie moze zaczynac okrazenia przed zakonczeniem poprzedniego"
+        return f"Podano zly czas {start_lap_time}. Zawodnik {runner} nie moze zaczynac okrazenia przed zakonczeniem poprzedniego"
     query = Q(runnerId=runner, startLapDate__lt=startLapDate)
     numberOfLaps = RunningLap.objects.filter(query).count() + 1
     new_running_lap = RunningLap(runnerId=runner, startLapDate=startLapDate, endLapDate=endLapDate, numberOfLaps=numberOfLaps)

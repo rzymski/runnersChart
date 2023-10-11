@@ -62,7 +62,9 @@ def customAdmin(request):
                         startTime = form.cleaned_data['start_time_input']
                         endTime = form.cleaned_data['end_time_input']
                         errorInformation = try_save_runningLap(form.prefix, startTime, endTime)
-                        print(errorInformation) if errorInformation is not None else print("BRAK BLEDOW")
+                        if errorInformation is not None:
+                            print(errorInformation)
+                            messages.success(request, errorInformation)
                     else:
                         print("NOT VALID")
         elif 'checkBoxSubmit' in request.POST and 'mainTimeForm-time_input' in request.POST:
@@ -70,7 +72,10 @@ def customAdmin(request):
             selected_items = request.POST.getlist('selected_items')
             mainTimeData = request.POST.get('mainTimeForm-time_input')
             errorInformation = save_multiple_runningLaps(selected_items, mainTimeData)
-            print(errorInformation) if errorInformation is not None else print("BRAK BLEDOW")
+            if errorInformation:
+                print(errorInformation)
+                for error in errorInformation:
+                    messages.success(request, error)
         return redirect('customAdmin')
     return render(request, 'admin/customAdmin.html', {"lastRunsData": lastRunsData, "table_script": 'tableAdmin', 'mainTime': mainTime})
 
