@@ -5,7 +5,7 @@
            .addClass('filters')
            .appendTo('#example thead');
 
-       $('#example thead tr.filters th:nth-last-child(2)').text('Pojedynczy start/stop');
+       $('#example thead tr.filters th:nth-last-child(1)').text('Pojedynczy start/stop');
 
        var table = $('#example').DataTable({
            paging: true, //stronicowanie
@@ -22,7 +22,7 @@
 
            initComplete: function() {
                var api = this.api();
-               api.columns([0,1,2,3,4,5])
+               api.columns([1,2,3,4,5,6])
                    .eq(0)
                    .each(function(colIdx) {
                         var cell = $('.filters th').eq(

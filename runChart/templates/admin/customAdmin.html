@@ -36,24 +36,26 @@
                         <table class="table table-bordered" id="example" style="text-align: center;">
                             <thead class="table-success">
                                 <tr>
-                                    <th style="width: 10%;">ID</th>
+                                    <th style="width: 5%; color: transparent"></th>
+                                    <th style="width: 5%;">ID</th>
                                     <th style="width: 10%;">Imie</th>
                                     <th style="width: 15%;">Nazwisko</th>
                                     <th style="width: 10%;">Liczba okrazen</th>
-                                    <th style="width: 15%;">Czas rozpoczecia okrazenia</th>
                                     <th style="width: 15%;">Aktualny stan</th>
-                                    <th style="width: 20%;">Rozpocznij/Zakoncz Bieg</th>
-                                    <th style="width: 5%; color: transparent"></th>
+                                    <th style="width: 15%;">Czas rozpoczecia okrazenia</th>
+                                    <th style="width: 25%;">Rozpocznij/Zakoncz Bieg</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for lastRun in lastRunsData %}
                                 <tr>
+                                    <td>
+                                        <input type="checkbox" name="selected_items" value="{{ forloop.counter }}">
+                                    </td>
                                     <td>{{ lastRun.0 }}</td>
                                     <td>{{ lastRun.1 }}</td>
                                     <td>{{ lastRun.2 }}</td>
                                     <td>{{ lastRun.3 }}</td>
-                                    <td>{{ lastRun.4 }}</td>
                                     {% if lastRun.5 == 'ODPOCZYWA' %}
                                         <td style="color: blue">{{ lastRun.5 }}</td>
                                     {% elif lastRun.5 == 'BIEGNIE' %}
@@ -61,6 +63,7 @@
                                     {% else %}
                                         <td>{{ lastRun.5 }}</td>
                                     {% endif %}
+                                    <td>{{ lastRun.4 }}</td>
                                     <td>
                                         {% if lastRun.5 == 'ODPOCZYWA' %}
                                             <form method="post" style="align-items: center">
@@ -95,9 +98,6 @@
                                                 </div>
                                             </form>
                                         {% endif %}
-                                    </td>
-                                    <td>
-                                        <input type="checkbox" name="selected_items" value="{{ forloop.counter }}">
                                     </td>
                                 </tr>
                                 {% endfor %}
