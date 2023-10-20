@@ -118,10 +118,8 @@ def get_longest_run_without_breaks_for_runner(runnerId):
         if previous_run_end is None:
             previous_run_end = run.startLapDate
         if previous_run_end.hour == run.startLapDate.hour and previous_run_end.minute == run.startLapDate.minute and run.endLapDate is not None:
-            # print(f"{previous_run_end} {run.startLapDate}")
             current_time += run.endLapDate - run.startLapDate
         elif previous_run_end != run.startLapDate and run.endLapDate is not None:
-            # print(f"KURWA {previous_run_end} {run.startLapDate}")
             current_time = run.endLapDate - run.startLapDate
         else:
             break
@@ -170,19 +168,17 @@ def get_runners_laps_in_time():
 
     runners = get_best_runners()
 
+    allRunners = list(Runner.objects.all())
+
     for run in runningLaps:
         if run.runnerId is not None:
             start_lap_date_warsaw = run.startLapDate.astimezone(warsaw_tz)
-            result[run.runnerId.id-1].append({'x': time(start_lap_date_warsaw.hour, start_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps - 1})
+            runner = Runner.objects.get(pk=run.runnerId.id)
+            index = allRunners.index(runner)
+            result[index].append({'x': time(start_lap_date_warsaw.hour, start_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps - 1})
             if run.endLapDate is not None:
                 end_lap_date_warsaw = run.endLapDate.astimezone(warsaw_tz)
-                result[run.runnerId.id-1].append({'x': time(end_lap_date_warsaw.hour, end_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps})
-            # Wersja z posortowanymi biegaczami wzgledem wyników (brak sprawdzenia null w endDate)
-            # runnerIndex = runners.index(run.runnerId.__str__())
-            # start_lap_date_warsaw = run.startLapDate.astimezone(warsaw_tz)
-            # result[runnerIndex].append({'x': time(start_lap_date_warsaw.hour, start_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps-1})
-            # end_lap_date_warsaw = run.endLapDate.astimezone(warsaw_tz)
-            # result[runnerIndex].append({'x': time(end_lap_date_warsaw.hour, end_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps})
+                result[index].append({'x': time(end_lap_date_warsaw.hour, end_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps})
     return result
 
 def get_laps_for_every_time():
@@ -195,8 +191,8 @@ def get_laps_for_every_time():
     dict = {running_lap: [0] * Runner.objects.count() for running_lap in running_laps}
     runners = Runner.objects.all()
     for startLapDate in dict:
-        for runner in runners:
-            dict[startLapDate][runner.id - 1] = get_max_laps_for_runner_before_date(runner.id, startLapDate)
+        for index, runner in enumerate(runners):
+            dict[startLapDate][index] = get_max_laps_for_runner_before_date(runner.id, startLapDate)
     return dict
 
 def get_max_laps_for_runner_before_date(runner_id, start_lap_date):
