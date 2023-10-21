@@ -90,8 +90,10 @@ def get_runner_actual_laps_and_status():
             minutes, _ = divmod(remainder, 60)
             timeDeltaStr = f"{hours}h i {minutes} minut temu" if datetime.now() > startLapDateDatetime else "nie rozpoczeto jeszcze"
             result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps-1, timeDeltaStr, status])
-        else:
+        elif status == 'ODPOCZYWA':
             result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps, '_______________', status])
+        else:
+            result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps-1, '_______________', status])
     return result
 
 def get_runner_laps_and_records():
