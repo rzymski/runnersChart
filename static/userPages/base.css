@@ -1,8 +1,12 @@
 body, html {
     margin: 0;
     padding: 0;
-    height: 100%;
+    /*height: 100%;*/
     max-width: 100%;
+    height: 100%;
+
+    display: grid;
+    grid-template-rows: 1fr auto;
 }
 
 .myNavAndContent{
@@ -10,7 +14,6 @@ body, html {
     overflow-x: hidden;
     height: 100%;
     /*height: 93%;*/
-    /*margin-bottom: 50px;*/
 
     /*usuniecie scrolla pionowego*/
     /*overflow: hidden;*/
@@ -23,6 +26,9 @@ body, html {
 
 
 footer{
+    grid-row-start: 2;
+    grid-row-end: 3;
+
     /*height: 7%;*/
     margin: 0px;
     padding: 0px;

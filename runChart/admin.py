@@ -198,9 +198,7 @@ class RunningLapAdmin(admin.ModelAdmin):
         for lap in laps:
             timezone.activate('Europe/Warsaw')
             startD = timezone.localtime(lap.startLapDate)
-            endD = None
-            if lap.endLapDate:
-                endD = timezone.localtime(lap.endLapDate)
+            endD = timezone.localtime(lap.endLapDate) if lap.endLapDate else None
             if search_term in str(startD) or endD and search_term in str(endD):
                 lapsWithDate.append(lap)
             timezone.deactivate()
