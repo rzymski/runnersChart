@@ -86,7 +86,10 @@ def get_runner_actual_laps_and_status():
             startLapDateDatetime = datetime(lastRun.startLapDate.year, lastRun.startLapDate.month, lastRun.startLapDate.day, lastRun.startLapDate.hour, lastRun.startLapDate.minute)
             startLapDateDatetime += timedelta(hours=2)
             timeDelta = datetime.now() - startLapDateDatetime
-            result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps-1, str(timeDelta), status])
+            hours, remainder = divmod(timeDelta.seconds, 3600)
+            minutes, _ = divmod(remainder, 60)
+            timeDeltaStr = f"{hours}h i {minutes} minut temu" if datetime.now() > startLapDateDatetime else "nie rozpoczeto jeszcze"
+            result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps-1, timeDeltaStr, status])
         else:
             result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps, '_______________', status])
     return result
