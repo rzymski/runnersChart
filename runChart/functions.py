@@ -81,7 +81,7 @@ def get_runner_actual_laps_and_status():
     result = []
     lastRuns = get_last_run_for_every_runner(False)
     for lastRun in lastRuns:
-        status = 'BIEGNIE' if lastRun.endLapDate is None else 'ODPOCZYWA'
+        status = 'ZAKOŃCZYŁ' if lastRun.runnerId.finished else ('BIEGNIE' if lastRun.endLapDate is None else 'ODPOCZYWA')
         if status == 'BIEGNIE':
             startLapDateDatetime = datetime(lastRun.startLapDate.year, lastRun.startLapDate.month, lastRun.startLapDate.day, lastRun.startLapDate.hour, lastRun.startLapDate.minute)
             startLapDateDatetime += timedelta(hours=2)
@@ -99,9 +99,14 @@ def get_runner_laps_and_records():
         shortestTime = get_best_time_for_runner(lastRun.runnerId)
         longestTime = get_longest_run_without_breaks_for_runner(lastRun.runnerId)
         if lastRun.endLapDate is None:
-            result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, rank+1, lastRun.numberOfLaps - 1, shortestTime, longestTime])
+            # to sie nie powinno nigdy wykonac nawet
+            result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, rank+1, lastRun.numberOfLaps - 1, shortestTime, longestTime, "BIEGNIE"])
         else:
-            result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, rank+1, lastRun.numberOfLaps, shortestTime, longestTime])
+            end = datetime(lastRun.endLapDate.year, lastRun.endLapDate.month, lastRun.endLapDate.day, lastRun.endLapDate.hour, lastRun.endLapDate.minute)
+            end += timedelta(hours=2)
+            runsOfThisRunner = RunningLap.objects.filter(runnerId=lastRun.runnerId)
+            status = 'ZAKOŃCZYŁ' if lastRun.runnerId.finished else ('BIEGNIE' if len(runsOfThisRunner) != lastRun.numberOfLaps else 'ODPOCZYWA')
+            result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, rank+1, lastRun.numberOfLaps, shortestTime, longestTime, f"{end.hour}:{end.minute}", status])
     return result
 
 def get_actual_ranking(run):

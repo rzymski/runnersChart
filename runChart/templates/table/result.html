@@ -12,12 +12,14 @@
                     <thead class="table-success">
                         <tr>
                             <th style="width: 5%;">ID</th>
-                            <th style="width: 15%;">Imie</th>
-                            <th style="width: 25%;">Nazwisko</th>
+                            <th style="width: 10%;">Imie</th>
+                            <th style="width: 10%;">Nazwisko</th>
                             <th style="width: 5%;">Ranking</th>
-                            <th style="width: 12%;">Liczba okrażeń</th>
-                            <th style="width: 18%;">Najszybsze okrazenie</th>
-                            <th style="width: 20%;">Najdłuższy bieg bez przerwy</th>
+                            <th style="width: 18%;">Godzina zakonczenia ostatniego okrazenia</th>
+                            <th style="width: 10%;">Status</th>
+                            <th style="width: 15%;">Liczba ukończonych okrażeń</th>
+                            <th style="width: 15%;">Najszybsze okrazenie</th>
+                            <th style="width: 12%;">Najdłuższy bieg bez przerwy</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -27,6 +29,15 @@
                             <td>{{ run.1 }}</td>
                             <td>{{ run.2 }}</td>
                             <td>{{ run.3 }}</td>
+                            <td>{{ run.7 }}</td>
+                            {% if run.8 == 'ODPOCZYWA' %}
+                                <td style="color: blue">{{ run.8 }}</td>
+                            {% elif run.8 == 'BIEGNIE' %}
+                                <td style="color: red">{{ run.8 }}</td>
+                            {% else %}
+                                <td>{{ run.8 }}</td>
+                            {% endif %}
+                            <!--<td>{{ run.8 }}</td>-->
                             <td>{{ run.4 }}</td>
                             <td>{{ run.5 }}</td>
                             <td>{{ run.6 }}</td>

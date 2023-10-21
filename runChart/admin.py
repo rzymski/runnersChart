@@ -62,10 +62,10 @@ def upload_csvFileUniversal(request, model_name):
 @admin.register(Runner)
 class RunnerAdmin(admin.ModelAdmin):
     change_list_template = 'admin/runChart/Runner/change_list.html'
-    list_display = ('id', 'name', 'surname')
-    list_filter = ('id', 'name', 'surname')
+    list_display = ('id', 'name', 'surname', 'finished')
+    list_filter = ('id', 'name', 'surname', 'finished')
     search_fields = ('id', 'name', 'surname')
-    ordering = ('id', 'name', 'surname')
+    ordering = ('id', 'name', 'surname', 'finished')
 
     def get_urls(self):
         urls = super().get_urls()
@@ -86,11 +86,10 @@ class RunningLapForm(forms.ModelForm):
 @admin.register(RunningLap)
 class RunningLapAdmin(admin.ModelAdmin):
     change_list_template = 'admin/runChart/RunningLap/change_list.html'
-
     form = RunningLapForm
     list_display = ('runnerId', 'startCustomizedDate', 'endCustomizedDate', 'numberOfLaps')
     # list_display = ('runnerId', 'startLapDate', 'endLapDate', 'numberOfLaps')
-    ordering = ('startLapDate', 'endLapDate', 'numberOfLaps', 'runnerId')
+    ordering = ('endLapDate', 'startLapDate', 'numberOfLaps', 'runnerId')
     list_filter = ('runnerId', 'runnerId__name', 'runnerId__surname', 'startLapDate', 'endLapDate', 'numberOfLaps')
     # search_fields = ('runnerId__id', 'runnerId__name', 'runnerId__surname', 'startLapDate', 'endLapDate', 'numberOfLaps')
     search_fields = ('runnerId__id', 'runnerId__name', 'runnerId__surname', 'numberOfLaps')
