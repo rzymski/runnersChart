@@ -65,7 +65,7 @@
                     titleAttr: 'Kopiuj',
                     title: 'Tabela wyników biegaczy',
                     exportOptions: { //kolumny, które ma zkopiować
-                        columns: [0, 1, 2, 3, 4, 5, 6]
+                        columns: [0, 1, 2, 3, 4, 6, 7, 8]
                     }
                 },
                 { //EXCEL
@@ -76,7 +76,7 @@
                     title: 'Tabela wyników biegaczy',
                     filename: 'runnersResult',
                     exportOptions: { //kolumny, które ma exportowac do excela
-                        columns: [0, 1, 2, 3, 4, 5, 6]
+                        columns: [0, 1, 2, 3, 4, 6, 7, 8]
                     }
                 },
                 { //PRINT
@@ -86,7 +86,7 @@
                     titleAttr: 'Wydrukuj',
                     title: 'Tabela wyników biegaczy',
                     exportOptions: { //kolumny, które ma wydrukować
-                        columns: [0, 1, 2, 3, 4, 5, 6]
+                        columns: [0, 1, 2, 3, 4, 6, 7, 8]
                     },
                     //zmiana czcionki wydrukowanego textu
                     customize: function ( win ){
@@ -103,11 +103,7 @@
                     titleAttr: 'PDF',
                     filename: 'runnersResult',
                     exportOptions: { //kolumny, które ma exportowac do excela
-                        columns: [0, 1, 2, 3, 4, 5, 6]
-                    },
-                    //Wyśrodkowanie kolumn
-                    tableHeader: {
-                        alignment: 'center'
+                        columns: [0, 1, 2, 3, 4, 6, 7, 8]
                     },
                     //Zmiana czcionki i położenia
                     customize: function ( doc ){
@@ -115,10 +111,11 @@
                         doc.styles.tableHeader.alignment = 'center';
                         doc.styles.tableBodyOdd.alignment = 'center'; //wysrodkowanie szarych wierszy (nieparzystych)
                         doc.styles.tableBodyEven.alignment = 'center'; //wysrodkowanie bialych wierszy (parzystych)
-                        {#doc.styles.tableHeader.fontSize = 7;#}
+                        {#doc.styles.tableHeader.fontSize = 8;#}
                         {#doc.defaultStyle.fontSize = 6;#}
-                        //100% szerokosci tabeli
-                        doc.content[1].table.widths = Array(doc.content[1].table.body[1].length + 1).join('*').split('');
+                        doc.pageMargins = [0, 0, 0, 0];
+                        //100% szerokosci tabeli psuje sie jesli jest za duza tabela
+                        {#doc.content[1].table.widths = Array(doc.content[1].table.body[1].length + 1).join('*').split('');#}
                     }
                 },
             ],
