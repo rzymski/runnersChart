@@ -105,13 +105,18 @@ def get_runner_laps_and_records():
         longestTime = get_longest_run_without_breaks_for_runner(lastRun.runnerId)
         if lastRun.endLapDate is None:
             # to sie nie powinno nigdy wykonac nawet
+            print("CO JEST CZEMU TO SIE WYKONALO")
             result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, rank+1, lastRun.numberOfLaps - 1, shortestTime, longestTime, "BIEGNIE"])
         else:
             end = datetime(lastRun.endLapDate.year, lastRun.endLapDate.month, lastRun.endLapDate.day, lastRun.endLapDate.hour, lastRun.endLapDate.minute)
             end += timedelta(hours=2)
+            endHour = str(end.hour)
+            endMinute = str(end.minute)
+            if end.minute < 10:
+                endMinute = "0"+endMinute
             runsOfThisRunner = RunningLap.objects.filter(runnerId=lastRun.runnerId)
             status = 'ZAKOŃCZYŁ' if lastRun.runnerId.finished else ('BIEGNIE' if len(runsOfThisRunner) != lastRun.numberOfLaps else 'ODPOCZYWA')
-            result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, rank+1, lastRun.numberOfLaps, shortestTime, longestTime, f"{end.hour}:{end.minute}", status])
+            result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, rank+1, lastRun.numberOfLaps, shortestTime, longestTime, f"{endHour}:{endMinute}", status])
     return result
 
 def get_actual_ranking(run):
