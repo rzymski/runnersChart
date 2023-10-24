@@ -105,7 +105,6 @@ def get_runner_laps_and_records():
         longestTime = get_longest_run_without_breaks_for_runner(lastRun.runnerId)
         if lastRun.endLapDate is None:
             # to sie nie powinno nigdy wykonac nawet
-            print("CO JEST CZEMU TO SIE WYKONALO")
             result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, rank+1, lastRun.numberOfLaps - 1, shortestTime, longestTime, "BIEGNIE"])
         else:
             end = datetime(lastRun.endLapDate.year, lastRun.endLapDate.month, lastRun.endLapDate.day, lastRun.endLapDate.hour, lastRun.endLapDate.minute)
