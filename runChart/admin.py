@@ -9,12 +9,12 @@ from django.shortcuts import render, redirect
 from datetime import time, datetime, timedelta
 from django.utils import timezone
 from django.db.models import Q
-#Admin
-# login : admin
-# password : admin
+from django.contrib.admin import widgets
+
 
 class CsvImportForm(forms.Form):
     csv_upload = forms.FileField()
+
 
 def upload_csvFileUniversal(request, model_name):
     model = apps.get_model(app_label='runChart', model_name=model_name)
@@ -59,6 +59,7 @@ def upload_csvFileUniversal(request, model_name):
     data = {"form": form}
     return render(request, "admin/csvFile_upload.html", data)
 
+
 @admin.register(Runner)
 class RunnerAdmin(admin.ModelAdmin):
     change_list_template = 'admin/runChart/Runner/change_list.html'
@@ -71,17 +72,19 @@ class RunnerAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         new_urls = [path('upload-csvFile/', self.upload_csvFile), ]
         return new_urls + urls
-    def upload_csvFile(self, request):
+
+    @staticmethod
+    def upload_csvFile(request):
         return upload_csvFileUniversal(request, "Runner")
 
 
-from django.contrib.admin import widgets
 class RunningLapForm(forms.ModelForm):
     class Meta:
         model = RunningLap
         fields = '__all__'
     startLapTime = forms.TimeField(widget=widgets.AdminTimeWidget, label="Czas rozpoczecia okrazenia")
     endLapTime = forms.TimeField(widget=widgets.AdminTimeWidget, label="Czas zakonczenia okrazenia", required=False)
+
 
 @admin.register(RunningLap)
 class RunningLapAdmin(admin.ModelAdmin):
@@ -101,6 +104,7 @@ class RunningLapAdmin(admin.ModelAdmin):
         timezone.deactivate()
         return formatedDate
     startCustomizedDate.short_description = 'Czas rozpoczecia okrazenia'
+
     def endCustomizedDate(self, obj):
         if obj.endLapDate is None:
             return '_________________________'
@@ -124,6 +128,7 @@ class RunningLapAdmin(admin.ModelAdmin):
                 run.save()
             print(runsAfter)
         return super().delete_view(request, object_id, extra_context)
+
     def change_view(self, request, object_id, form_url='', extra_context=None):
         if request.method == "POST":
             obj = self.get_object(request, object_id)
@@ -134,6 +139,7 @@ class RunningLapAdmin(admin.ModelAdmin):
                 run.numberOfLaps -= 1
                 run.save()
         return super().change_view(request, object_id, form_url, extra_context)
+
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
         if obj is not None and obj.endLapDate is not None:
@@ -192,7 +198,8 @@ class RunningLapAdmin(admin.ModelAdmin):
             queryset |= lapsWithDate_queryset
         return queryset, may_have_duplicates
 
-    def search_date(self, search_term):
+    @staticmethod
+    def search_date(search_term):
         laps = RunningLap.objects.all()
         lapsWithDate = []
         for lap in laps:
@@ -204,7 +211,8 @@ class RunningLapAdmin(admin.ModelAdmin):
             timezone.deactivate()
         return lapsWithDate
 
-    def countLap(self, runner_id, start_lap_date):
+    @staticmethod
+    def countLap(runner_id, start_lap_date):
         query = Q(runnerId=runner_id, startLapDate__lt=start_lap_date)
         number = RunningLap.objects.filter(query).count() + 1
         return number
@@ -213,5 +221,7 @@ class RunningLapAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         new_urls = [path('upload-csvFile/', self.upload_csvFile), ]
         return new_urls + urls
-    def upload_csvFile(self, request):
+
+    @staticmethod
+    def upload_csvFile(request):
         return upload_csvFileUniversal(request, "RunningLap")

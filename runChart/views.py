@@ -50,14 +50,14 @@ def runnerResults(request, runnerId):
 def customAdmin(request):
     lastRunsData = get_runner_actual_laps_and_status()
     for index, lastRun in enumerate(lastRunsData, 1):
-        lastRun.append(timeForm(prefix=str(lastRun[0])))
+        lastRun.append(TimeForm(prefix=str(lastRun[0])))
     mainTime = MyTimeForm(prefix='mainTimeForm')
     if request.method == 'POST':
         if 'singleInputSubmit' in request.POST:
             # print("Single input work")
             for formInList in [sublist[6] for sublist in lastRunsData]:
                 if f"{formInList.prefix}-start_time_input" in request.POST and f"{formInList.prefix}-end_time_input" in request.POST:
-                    form = timeForm(request.POST, prefix=formInList.prefix)
+                    form = TimeForm(request.POST, prefix=formInList.prefix)
                     if form.is_valid():
                         startTime = form.cleaned_data['start_time_input']
                         endTime = form.cleaned_data['end_time_input']

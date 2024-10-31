@@ -4,6 +4,7 @@ import pytz
 from django.db.models import Max, F, Q
 from django.utils import timezone
 
+
 def save_multiple_runningLaps(runnerIds, time_str):
     if time_str is None or time_str == '':
         return "Nie podano czasu"
@@ -25,6 +26,7 @@ def save_multiple_runningLaps(runnerIds, time_str):
         if error:
             errorInformation.append(error)
     return errorInformation
+
 
 def try_save_runningLap(runnerId, startTime=None, endTime=None):
     errorTime = startTime if startTime is not None else endTime
@@ -50,6 +52,7 @@ def try_save_runningLap(runnerId, startTime=None, endTime=None):
     else:
         errorInformation = "Nie otrzymano ani czasu rozpoczecia ani zakonczenia"
     return errorInformation if errorInformation is not None else None
+
 
 def save_running_lap(runner, start_lap_time, end_lap_time=None):
     startLapDate = None
@@ -77,6 +80,7 @@ def save_running_lap(runner, start_lap_time, end_lap_time=None):
     new_running_lap.save()
     return None
 
+
 def get_runner_actual_laps_and_status():
     result = []
     lastRuns = get_last_run_for_every_runner(False)
@@ -85,6 +89,11 @@ def get_runner_actual_laps_and_status():
         if status == 'BIEGNIE':
             startLapDateDatetime = datetime(lastRun.startLapDate.year, lastRun.startLapDate.month, lastRun.startLapDate.day, lastRun.startLapDate.hour, lastRun.startLapDate.minute)
             startLapDateDatetime += timedelta(hours=2)
+            # WERSJA ALTERNATYWNA NIE TRZEBA TIMEDELTA DLA startLapDateDatetime
+            # warsawEuropeTz = pytz.timezone("Europe/Warsaw")
+            # timeInWarsaw = datetime.now(warsawEuropeTz)
+            # currentTimeInWarsaw = timeInWarsaw.strftime("%H:%M:%S")
+            # print(f"EXPERYMENT Teraz datetime={datetime.now()} z strefa czasowo={currentTimeInWarsaw}")
             timeDelta = datetime.now() - startLapDateDatetime
             hours, remainder = divmod(timeDelta.seconds, 3600)
             minutes, _ = divmod(remainder, 60)
@@ -93,8 +102,12 @@ def get_runner_actual_laps_and_status():
         elif status == 'ODPOCZYWA':
             result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps, '_______________', status])
         else:
-            result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps-1, '_______________', status])
+            if lastRun.endLapDate:
+                result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps, '_______________', status])
+            else:
+                result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps-1, '_______________', status])
     return result
+
 
 def get_runner_laps_and_records():
     result = []
@@ -109,19 +122,18 @@ def get_runner_laps_and_records():
         else:
             end = datetime(lastRun.endLapDate.year, lastRun.endLapDate.month, lastRun.endLapDate.day, lastRun.endLapDate.hour, lastRun.endLapDate.minute)
             end += timedelta(hours=2)
-            endHour = str(end.hour)
-            endMinute = str(end.minute)
-            if end.minute < 10:
-                endMinute = "0"+endMinute
+            endTime = end.strftime("%Y-%m-%d  %H:%M")
             runsOfThisRunner = RunningLap.objects.filter(runnerId=lastRun.runnerId)
             status = 'ZAKOŃCZYŁ' if lastRun.runnerId.finished else ('BIEGNIE' if len(runsOfThisRunner) != lastRun.numberOfLaps else 'ODPOCZYWA')
-            result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, rank+1, lastRun.numberOfLaps, shortestTime, longestTime, f"{endHour}:{endMinute}", status])
+            result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, rank+1, lastRun.numberOfLaps, shortestTime, longestTime, endTime, status])
     return result
+
 
 def get_actual_ranking(run):
     runs_before = RunningLap.objects.filter(endLapDate__lt=run.endLapDate, numberOfLaps=run.numberOfLaps)
     distinct_runner_count = runs_before.values('runnerId').distinct().count()
     return distinct_runner_count+1
+
 
 def get_longest_run_without_breaks_for_runner(runnerId):
     runs = RunningLap.objects.filter(runnerId=runnerId).order_by('startLapDate')
@@ -142,6 +154,7 @@ def get_longest_run_without_breaks_for_runner(runnerId):
         previous_run_end = run.endLapDate
     return longest_time
 
+
 def get_best_time_for_runner(runnerId):
     runs = RunningLap.objects.filter(runnerId=runnerId)
     shortest_time = timedelta.max if runs else None
@@ -153,6 +166,7 @@ def get_best_time_for_runner(runnerId):
         shortest_time = None
     return shortest_time
 
+
 def get_last_run_for_every_runner(finished):
     lastRuns = []
     if finished:
@@ -163,6 +177,7 @@ def get_last_run_for_every_runner(finished):
         lastRuns.append(RunningLap.objects.filter(runnerId=m['runnerId'], numberOfLaps=m['numberOfLaps']).first())
     return lastRuns
 
+
 def get_best_runners():
     bestRuns = []
     runners = []
@@ -172,6 +187,7 @@ def get_best_runners():
             bestRuns.append(run.runnerId)
             runners.append(run.runnerId.__str__())
     return runners
+
 
 def get_runners_laps_in_time():
     result = []
@@ -195,6 +211,7 @@ def get_runners_laps_in_time():
                 result[index].append({'x': time(end_lap_date_warsaw.hour, end_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps})
     return result
 
+
 def get_laps_for_every_time():
     runningLapStartDates = list(RunningLap.objects.values_list('startLapDate', flat=True).distinct().order_by('startLapDate'))
     runningLapEndDatesWithNones = list(RunningLap.objects.values_list('endLapDate', flat=True).distinct().order_by('endLapDate'))
@@ -208,6 +225,7 @@ def get_laps_for_every_time():
         for index, runner in enumerate(runners):
             dict[startLapDate][index] = get_max_laps_for_runner_before_date(runner.id, startLapDate)
     return dict
+
 
 def get_max_laps_for_runner_before_date(runner_id, start_lap_date):
     max_laps = RunningLap.objects.filter(
