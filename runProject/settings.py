@@ -9,7 +9,7 @@ SECRET_KEY = "django-insecure-g4eh8y8#cwxsu+%m-k!#*ji(ch1wf6dq)hel791ebon44%0^j^
 # SECURITY WARNING: don't chart with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['nocnybieg2023.pythonanywhere.com', '127.0.0.1']
+ALLOWED_HOSTS = ['nocnybieg2023.pythonanywhere.com', 'ultradoba2024.pythonanywhere.com', '127.0.0.1']
 
 
 # Application definition

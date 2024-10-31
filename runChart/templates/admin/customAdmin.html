@@ -5,15 +5,10 @@
         <head>
             {% load static %}
             <title>Panel administratorski</title>
+
             <script src="{% url 'js-catlog' %}"></script>
             <script src="{% static '/admin/js/core.js' %}"></script>
             <link rel="stylesheet" href="{% static 'admin/css/widgets.css' %}">
-            <style>
-                .clockbox.module {z-index: 9999; background-color: white}
-                .calendar-cancel a {background-color: red; color: white ; font-size: 1.75rem}
-                .clockbox.module ul {font-size: 0.8rem;}
-                .timelist a:hover {font-size: 0.8rem; color: red}
-            </style>
         </head>
         <body>
             <div class="xd">
@@ -24,6 +19,7 @@
                         <div style="float: right; padding-right: 5%">
                             <span style="display: inline-block;">
                                 {{ mainTime.time_input }}
+                                {{ mainTime.media }}
                             </span>
                             <button type="submit" name="checkBoxSubmit" id="checkBoxSubmit" class="btn btn-danger text-center" title="checkBox">
                                 <i class="fa-solid fa-person-running"></i>
