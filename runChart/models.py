@@ -1,6 +1,8 @@
 from django.db import models
 from datetime import datetime
 
+DEFAULT_RUNS_START = datetime(2024, 11, 2, 21, 30)
+
 
 class Runner(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -14,7 +16,7 @@ class Runner(models.Model):
 
 class RunningLap(models.Model):
     runnerId = models.ForeignKey(Runner, on_delete=models.CASCADE, verbose_name="Biegacz")
-    startLapDate = models.DateTimeField(default=datetime(2023, 10, 21, 21, 30), verbose_name="Data rozpoczecia okrazenia")
+    startLapDate = models.DateTimeField(default=DEFAULT_RUNS_START, verbose_name="Data rozpoczecia okrazenia")
     endLapDate = models.DateTimeField(verbose_name="Data zakonczenia okrazenia", blank=True, null=True)
     numberOfLaps = models.IntegerField(default=0, verbose_name='Liczba okrazen')
 

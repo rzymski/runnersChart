@@ -4,6 +4,9 @@ import pytz
 from django.db.models import Max, F, Q
 from django.utils import timezone
 
+FIRST_DAY = datetime(2024, 11, 2)
+SECOND_DAY = FIRST_DAY + timedelta(days=1)
+
 
 def save_multiple_runningLaps(runnerIds, time_str):
     if time_str is None or time_str == '':
@@ -40,10 +43,10 @@ def try_save_runningLap(runnerId, startTime=None, endTime=None):
         lap = RunningLap.objects.filter(runnerId=runnerId).latest('startLapDate')
         if endTime >= time(21, 30):
             endLapDate = timezone.make_aware(
-                datetime(2023, 10, 21, endTime.hour, endTime.minute))
+                datetime(FIRST_DAY.year, FIRST_DAY.month, FIRST_DAY.day, endTime.hour, endTime.minute))
         else:
             endLapDate = timezone.make_aware(
-                datetime(2023, 10, 22, endTime.hour, endTime.minute))
+                datetime(SECOND_DAY.year, SECOND_DAY.month, SECOND_DAY.day, endTime.hour, endTime.minute))
         if endLapDate >= lap.startLapDate:
             lap.endLapDate = endLapDate
             lap.save()
@@ -59,17 +62,17 @@ def save_running_lap(runner, start_lap_time, end_lap_time=None):
     endLapDate = None
     if start_lap_time >= time(21, 30):
         startLapDate = timezone.make_aware(
-            datetime(2023, 10, 21, start_lap_time.hour, start_lap_time.minute))
+            datetime(FIRST_DAY.year, FIRST_DAY.month, FIRST_DAY.day, start_lap_time.hour, start_lap_time.minute))
     else:
         startLapDate = timezone.make_aware(
-            datetime(2023, 10, 22, start_lap_time.hour, start_lap_time.minute))
+            datetime(SECOND_DAY.year, SECOND_DAY.month, SECOND_DAY.day, start_lap_time.hour, start_lap_time.minute))
     if end_lap_time is not None:
         if end_lap_time >= time(21, 30):
             endLapDate = timezone.make_aware(
-                datetime(2023, 10, 21, end_lap_time.hour, end_lap_time.minute))
+                datetime(FIRST_DAY.year, FIRST_DAY.month, FIRST_DAY.day, end_lap_time.hour, end_lap_time.minute))
         else:
             endLapDate = timezone.make_aware(
-                datetime(2023, 10, 22, end_lap_time.hour, end_lap_time.minute))
+                datetime(SECOND_DAY.year, SECOND_DAY.month, SECOND_DAY.day, end_lap_time.hour, end_lap_time.minute))
     errorQuery = Q(runnerId=runner, endLapDate__gt=startLapDate)
     numberOfErrorLaps = RunningLap.objects.filter(errorQuery).count()
     if numberOfErrorLaps > 0:
@@ -159,9 +162,9 @@ def get_best_time_for_runner(runnerId):
     runs = RunningLap.objects.filter(runnerId=runnerId)
     shortest_time = timedelta.max if runs else None
     for run in runs:
-        time = run.endLapDate - run.startLapDate if run.endLapDate is not None else None
-        if time is not None and time < shortest_time:
-            shortest_time = time
+        run_time = run.endLapDate - run.startLapDate if run.endLapDate is not None else None
+        if run_time is not None and run_time < shortest_time:
+            shortest_time = run_time
     if shortest_time == timedelta.max:
         shortest_time = None
     return shortest_time
@@ -196,8 +199,6 @@ def get_runners_laps_in_time():
     runningLaps = RunningLap.objects.all().order_by('startLapDate')
     warsaw_tz = pytz.timezone('Europe/Warsaw')
 
-    runners = get_best_runners()
-
     allRunners = list(Runner.objects.all())
 
     for run in runningLaps:
@@ -219,12 +220,12 @@ def get_laps_for_every_time():
     runningLapsDates = sorted(runningLapStartDates + runningLapEndDates)
     europe_warsaw = pytz.timezone('Europe/Warsaw')
     running_laps = [dt.astimezone(europe_warsaw) for dt in runningLapsDates]
-    dict = {running_lap: [0] * Runner.objects.count() for running_lap in running_laps}
+    run_dict = {running_lap: [0] * Runner.objects.count() for running_lap in running_laps}
     runners = Runner.objects.all()
-    for startLapDate in dict:
+    for startLapDate in run_dict:
         for index, runner in enumerate(runners):
-            dict[startLapDate][index] = get_max_laps_for_runner_before_date(runner.id, startLapDate)
-    return dict
+            run_dict[startLapDate][index] = get_max_laps_for_runner_before_date(runner.id, startLapDate)
+    return run_dict
 
 
 def get_max_laps_for_runner_before_date(runner_id, start_lap_date):

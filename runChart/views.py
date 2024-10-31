@@ -10,6 +10,7 @@ from django.contrib.auth.models import auth
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
+
 def loginUser(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -29,9 +30,11 @@ def loginUser(request):
         print("GET login")
         return render(request, "authenticate/login.html")
 
+
 def logout(request):
     auth.logout(request)
     return redirect('index')
+
 
 def runnerResults(request, runnerId):
     runner = Runner.objects.get(id=runnerId)
@@ -49,7 +52,7 @@ def runnerResults(request, runnerId):
 @login_required(login_url="loginUser")
 def customAdmin(request):
     lastRunsData = get_runner_actual_laps_and_status()
-    for index, lastRun in enumerate(lastRunsData, 1):
+    for lastRun in lastRunsData:
         lastRun.append(TimeForm(prefix=str(lastRun[0])))
     mainTime = MyTimeForm(prefix='mainTimeForm')
     if request.method == 'POST':
@@ -79,9 +82,12 @@ def customAdmin(request):
         return redirect('customAdmin')
     return render(request, 'admin/customAdmin.html', {"lastRunsData": lastRunsData, "table_script": 'tableAdmin', 'mainTime': mainTime})
 
+
 def resultTable(request):
     runsData = get_runner_laps_and_records()
     return render(request, 'table/result.html', {"runsData": runsData, "table_script": 'tableUser'})
+
+
 def index(request):
     return line_chart(request)
 
