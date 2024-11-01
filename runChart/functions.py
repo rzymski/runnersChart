@@ -3,9 +3,10 @@ from datetime import datetime, time, timedelta
 import pytz
 from django.db.models import Max, F, Q
 from django.utils import timezone
+from django.conf import settings
 
-FIRST_DAY = datetime(2024, 11, 2)
-SECOND_DAY = FIRST_DAY + timedelta(days=1)
+FIRST_DAY = settings.FIRST_DAY
+SECOND_DAY = settings.SECOND_DAY
 
 
 def save_multiple_runningLaps(runnerIds, time_str):

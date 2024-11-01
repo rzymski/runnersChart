@@ -1,7 +1,7 @@
 from django.db import models
-from datetime import datetime
+from django.conf import settings
 
-DEFAULT_RUNS_START = datetime(2024, 11, 2, 21, 30)
+DEFAULT_RUNS_START = settings.DEFAULT_RUNS_START
 
 
 class Runner(models.Model):

@@ -10,6 +10,10 @@ from datetime import time, datetime, timedelta
 from django.utils import timezone
 from django.db.models import Q
 from django.contrib.admin import widgets
+from django.conf import settings
+
+FIRST_DAY = settings.FIRST_DAY
+SECOND_DAY = settings.SECOND_DAY
 
 
 class CsvImportForm(forms.Form):
@@ -34,16 +38,16 @@ def upload_csvFileUniversal(request, model_name):
                 elif header == "startLapDate":
                     start_lap_time_obj = datetime.strptime(value, "%H:%M").time()
                     if start_lap_time_obj >= time(21, 30):
-                        start_lap_date_obj = timezone.make_aware(datetime(2023, 10, 21, start_lap_time_obj.hour, start_lap_time_obj.minute))
+                        start_lap_date_obj = timezone.make_aware(datetime(FIRST_DAY.year, FIRST_DAY.month, FIRST_DAY.day, start_lap_time_obj.hour, start_lap_time_obj.minute))
                     else:
-                        start_lap_date_obj = timezone.make_aware(datetime(2023, 10, 22, start_lap_time_obj.hour, start_lap_time_obj.minute))
+                        start_lap_date_obj = timezone.make_aware(datetime(SECOND_DAY.year, SECOND_DAY.month, SECOND_DAY.day, start_lap_time_obj.hour, start_lap_time_obj.minute))
                     obj_dict[header] = start_lap_date_obj
                 elif header == "endLapDate":
                     end_lap_time_obj = datetime.strptime(value, "%H:%M").time()
                     if end_lap_time_obj >= time(21, 30):
-                        end_lap_date_obj = timezone.make_aware(datetime(2023, 10, 21, end_lap_time_obj.hour, end_lap_time_obj.minute))
+                        end_lap_date_obj = timezone.make_aware(datetime(FIRST_DAY.year, FIRST_DAY.month, FIRST_DAY.day, end_lap_time_obj.hour, end_lap_time_obj.minute))
                     else:
-                        end_lap_date_obj = timezone.make_aware(datetime(2023, 10, 22, end_lap_time_obj.hour, end_lap_time_obj.minute))
+                        end_lap_date_obj = timezone.make_aware(datetime(SECOND_DAY.year, SECOND_DAY.month, SECOND_DAY.day, end_lap_time_obj.hour, end_lap_time_obj.minute))
                     obj_dict[header] = end_lap_date_obj
                 else:
                     obj_dict[header] = value
@@ -98,9 +102,15 @@ class RunningLapAdmin(admin.ModelAdmin):
     search_fields = ('runnerId__id', 'runnerId__name', 'runnerId__surname', 'numberOfLaps')
     exclude = ('numberOfLaps', 'startLapDate', 'endLapDate') #nie trzeba podawać przy dodawaniu nowego rekordu
 
+    @staticmethod
+    def getPolishMonthName(monthNumber):
+        months = ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"]
+        return months[monthNumber-1]
+
     def startCustomizedDate(self, obj):
         timezone.activate('Europe/Warsaw')
-        formatedDate = timezone.localtime(obj.startLapDate).strftime('%d października %H:%M')
+        monthName = RunningLapAdmin.getPolishMonthName(timezone.localtime(obj.startLapDate).month)
+        formatedDate = timezone.localtime(obj.startLapDate).strftime(f'%d {monthName} %H:%M')
         timezone.deactivate()
         return formatedDate
     startCustomizedDate.short_description = 'Czas rozpoczecia okrazenia'
@@ -109,7 +119,8 @@ class RunningLapAdmin(admin.ModelAdmin):
         if obj.endLapDate is None:
             return '_________________________'
         timezone.activate('Europe/Warsaw')
-        formatedDate = timezone.localtime(obj.endLapDate).strftime('%d października %H:%M')
+        monthName = RunningLapAdmin.getPolishMonthName(timezone.localtime(obj.endLapDate).month)
+        formatedDate = timezone.localtime(obj.endLapDate).strftime(f'%d {monthName} %H:%M')
         timezone.deactivate()
         return formatedDate
     endCustomizedDate.short_description = 'Czas zakonczenia okrazenia'
@@ -164,15 +175,15 @@ class RunningLapAdmin(admin.ModelAdmin):
         if form is not None:
             startLapTime = form.cleaned_data.get('startLapTime')
             if startLapTime >= time(21, 30):
-                obj.startLapDate = timezone.make_aware(datetime(2023, 10, 21, startLapTime.hour, startLapTime.minute))
+                obj.startLapDate = timezone.make_aware(datetime(FIRST_DAY.year, FIRST_DAY.month, FIRST_DAY.day, startLapTime.hour, startLapTime.minute))
             else:
-                obj.startLapDate = timezone.make_aware(datetime(2023, 10, 22, startLapTime.hour, startLapTime.minute))
+                obj.startLapDate = timezone.make_aware(datetime(SECOND_DAY.year, SECOND_DAY.month, SECOND_DAY.day, startLapTime.hour, startLapTime.minute))
             endLapTime = form.cleaned_data.get('endLapTime')
             if endLapTime is not None:
                 if endLapTime >= time(21, 30):
-                    obj.endLapDate = timezone.make_aware(datetime(2023, 10, 21, endLapTime.hour, endLapTime.minute))
+                    obj.endLapDate = timezone.make_aware(datetime(FIRST_DAY.year, FIRST_DAY.month, FIRST_DAY.day, endLapTime.hour, endLapTime.minute))
                 else:
-                    obj.endLapDate = timezone.make_aware(datetime(2023, 10, 22, endLapTime.hour, endLapTime.minute))
+                    obj.endLapDate = timezone.make_aware(datetime(SECOND_DAY.year, SECOND_DAY.month, SECOND_DAY.day, endLapTime.hour, endLapTime.minute))
             else:
                 obj.endLapDate = None
         super().save_model(request, obj, form, change)
