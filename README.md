@@ -52,8 +52,12 @@ python manage.py migrate
 ```
 
 # Wdrożenie na serwer pythonanywhere:
-W sekcji **`Consoles`**		  
-Uruchamiamy konsole:
+<h3><details>
+    <summary>Uruchomienie konsoli w pythonanywhere:</summary>
+        W sekcji **`Consoles`**<br/>
+        Uruchamiamy konsole:        
+        <img src="redmeImages/launchConsole.png?raw=true" alt="uruchomienie konsoli w pythonanywhere">
+</details></h3>
 
 Klonujemy repozytorium:
 ```sh
@@ -70,34 +74,46 @@ Pobieramy wszystkie potrzebne pakiety z requirements.txt:
 pip install -r ./runnersChart/requirements.txt
 ```
 
-Przechodzimy do sekcji **`Web`**    
-Add a new web app --> ... --> Manual Configuration --> Python 3.10 --> ...
+<h3><details>
+    <summary>Dodanie aplikacji do serwera:</summary>
+        Add a new web app --> ... --> Manual Configuration --> Python 3.10 --> ...<br/>
+        <img src="redmeImages/addApplication.png?raw=true" alt="Dodanie aplikacji do serwera">
+</details></h3><br/>
 
-Source code: /home/nazwaUzytkownika/runnersChart (nazwa głównego folderu projektu i nazwa repozytorium na github-ie)
-Working directory: /home/nazwaUzytkownika
-
-Virtualenv: /home/nazwaUzytkownika/.virtualenvs/venv  
-Static files:    
-$\quad$ URL: /static/	    
-$\quad$ DIRECTORY: /home/nazwaUzytkownika/runnersChart/static
-
+<details>
+<summary><h3>Ustawienia w sekcji Web:</h3></summary>
+  <br/>Source code: /home/nazwaUzytkownika/runnersChart (nazwa głównego folderu projektu i nazwa repozytorium na github-ie) <br/>
+  <br/>Working directory: /home/nazwaUzytkownika <br/>
+  <br/>Virtualenv: /home/nazwaUzytkownika/.virtualenvs/venv <br/>
+  <br/>Static files: <br/>
+  &emsp; URL: /static/ <br/>
+  &emsp; DIRECTORY: /home/nazwaUzytkownika/runnersChart/static <br/><br/>
+    
 WSGI configuration file:
-```sh
+```python
 import os
 import sys
 path = os.path.expanduser('~/runnersChart')
 if path not in sys.path:
-	sys.path.insert(0, path)
+    sys.path.insert(0, path)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'runProject.settings'
 from django.core.wsgi import get_wsgi_application
 from django.contrib.staticfiles.handlers import StaticFilesHandler
 application = StaticFilesHandler(get_wsgi_application())
 ```
+<br/><img src="redmeImages/webSettings.png?raw=true" alt="Ustawienia aplikacji na serwerze">
+</details>
 
-Polecenie do przeładowania plików statycznych:
+Po skonfigurowaniu warto również dla pewności jeszcze raz upewnić się, że pliki statyczne są załadowane.<br/>
+**Polecenie do przeładowania plików statycznych:**
 ```sh
 python manage.py collectstatic
 ```
+
+<h3><details>
+    <summary>Przeładowanie aplikacji na serwerze:</summary>
+        <img src="redmeImages/reloadSide.png?raw=true" alt="Przeladowanie aplikacji na serwerze">
+</details></h3>
 
 # Działanie aplikacji na serwerze
 Można sprawdzić działanie aplikacji w:  

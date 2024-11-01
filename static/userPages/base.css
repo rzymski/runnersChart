@@ -1,27 +1,19 @@
 body, html {
-    height: 100vh;
-    overflow-y: hidden; /* Wyłączenie przewijania w osi Y */
     margin: 0;
     padding: 0;
-
-    /*margin: 0;*/
-    /*padding: 0;*/
-    /*!*height: 100%;*!*/
-    max-width: 100%;
     /*height: 100%;*/
+    max-width: 100%;
+    height: 100%;
 
-    /*display: grid;*/
-    /*grid-template-rows: 1fr auto;*/
+    display: grid;
+    grid-template-rows: 1fr auto;
 }
 
 .myNavAndContent{
     max-width: 100%;
     overflow-x: hidden;
-    /*height: 100%;*/
-    /*!*height: 93%;*!*/
-
-    height: 100vh; /* Zamiast 100%, użyj wysokości całego widoku przeglądarki */
-    overflow-y: hidden;
+    height: 100%;
+    /*height: 93%;*/
 
     /*usuniecie scrolla pionowego*/
     /*overflow: hidden;*/
