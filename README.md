@@ -105,7 +105,7 @@ pip install -r ./runnersChart/requirements.txt
 <h3><details>
     <summary>Dodanie aplikacji do serwera:</summary>
         Add a new web app --> ... --> Manual Configuration --> Python 3.10 --> ...<br/>
-        <img src="redmeImages/addApplication.png?raw=true" alt="Dodanie aplikacji do serwera">
+        <img src="readmeImages/addApplication.png?raw=true" alt="Dodanie aplikacji do serwera">
 </details></h3>
 
 <details>
@@ -140,7 +140,7 @@ python manage.py collectstatic
 
 <h3><details>
     <summary>Przeładowanie aplikacji na serwerze:</summary>
-        <img src="redmeImages/reloadSide.png?raw=true" alt="Przeladowanie aplikacji na serwerze">
+        <img src="readmeImages/reloadSide.png?raw=true" alt="Przeladowanie aplikacji na serwerze">
 </details></h3>
 
 # Działanie aplikacji na serwerze
