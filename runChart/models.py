@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 
-DEFAULT_RUNS_START = settings.DEFAULT_RUNS_START
+DEFAULT_RUNS_START = settings.FIRST_DAY
 
 
 class Runner(models.Model):

@@ -1,21 +1,29 @@
 ___
-**Aplikacja webowa stworzona w Django do wyświetlania wyników biegaczy na wykresie i w tabelce**
+**Aplikacja webowa stworzona w Django 4.2.5 i pythonie 3.11.1**
 ___
 
 ## Zawartość REDME
-1. :runner: [Funkcjonalność](#funkcjonalność)
-2. :computer: [Uruchomienie lokalnie](#Instrukcja-uruchomienia-lokalnie)
-3. :wrench: [Konfiguracja lokalna](#konfiguracja-lokalna)
-4. :satellite: [Wdrożenie na serwer pythonanywhere](#wdrożenie-na-serwer-pythonanywhere)
-5. :globe_with_meridians: [Działanie aplikacji na serwerze](#działanie-aplikacji-na-serwerze)
+1. :runner: [Cel aplikacji](#cel-aplikacji)
+2. :scroll: [Funkcjonalność](#funkcjonalność)
+3. :computer: [Uruchomienie aplikacji lokalnie](#Instrukcja-uruchomienia-aplikacji-lokalnie)
+4. :wrench: [Konfiguracja](#konfiguracja)
+5. :satellite: [Wdrożenie na serwer pythonanywhere](#wdrożenie-na-serwer-pythonanywhere)
+6. :globe_with_meridians: [Działanie aplikacji na serwerze](#działanie-aplikacji-na-serwerze)
+
+# Cel aplikacji
+Aplikacja została stworzona na potrzeby wydarzenia dwudniowego biegu, zaczynającego się wieczorem i kończącego ranem następnego dnia.<br/>
+Aplikacja umożliwia prezentacje wyników biegaczy w formie wykresu i tabeli.<br/>
+Zarządzanie danymi biegów aplikacji odbywa się w dostosowanym panelu administracyjnym lub domyślnym panelu administracyjnym.
 
 # Funkcjonalność
 1) [x] Wykres z wynikami biegaczy
-2) [x] Tabelka z wynikami biegaczy
-3) [x] Dostosowany panel administracyjny
+2) [x] Tabela z wynikami biegaczy
+3) [x] Tabela z wynikami pojedyńczego biegacza
+4) [x] Dostosowany panel administracyjny
+5) [x] Strandardowy panel administracyjny Django
 
 
-# Instrukcja uruchomienia lokalnie:
+# Instrukcja uruchomienia aplikacji lokalnie:
 Tworzymy wirtualne środowisko
 ```sh
 python -m venv venv
@@ -35,7 +43,27 @@ Uruchomienie projektu Django
 python manage.py runserver 'nrPortu opcjonalnie'
 ```
 
-# Konfiguracja lokalna:
+# Konfiguracja:
+
+> [!Important]
+> ### Ustawiamy datę biegu w:
+> [runProject\settings.py](https://github.com/rzymski/runnersChart/blob/master/runProject/settings.py) ${\textsf{\color{gold}FIRST\\_DAY}}$ **`datetime(2024, 11, 2, 21, 30)`**
+
+<details>
+  <summary>Kod <b><code>FIRST_DAY</code></b> zawierający datę biegu <b>datetime(2024, 11, 2, 21, 30)</b></summary>
+
+```python
+from pathlib import Path
+
+from datetime import datetime, timedelta
+FIRST_DAY = datetime(2024, 11, 2, 21, 30)
+SECOND_DAY = FIRST_DAY + timedelta(days=1)
+```
+<img src="readmeImages/settings.png?raw=true" alt="Wybranie daty biegu w ustawieniach kodu">
+</details>
+
+<h3>Przydatne polecenia:</h3>
+
 Tworzenie super użytkownika
 ```sh
 python manage.py createsuperuser
@@ -56,7 +84,7 @@ python manage.py migrate
     <summary><h3>Uruchomienie konsoli w pythonanywhere:</h3></summary>
         W sekcji <code>Consoles</code><br/>
         Uruchamiamy konsole:        
-        <img src="redmeImages/launchConsole.png?raw=true" alt="uruchomienie konsoli w pythonanywhere">
+        <img src="readmeImages/launchConsole.png?raw=true" alt="uruchomienie konsoli w pythonanywhere">
 </details>
 
 Klonujemy repozytorium:
@@ -101,7 +129,7 @@ from django.core.wsgi import get_wsgi_application
 from django.contrib.staticfiles.handlers import StaticFilesHandler
 application = StaticFilesHandler(get_wsgi_application())
 ```
-<br/><img src="redmeImages/webSettings.png?raw=true" alt="Ustawienia aplikacji na serwerze">
+<img src="readmeImages/webSettings.png?raw=true" alt="Ustawienia aplikacji na serwerze">
 </details>
 
 Po skonfigurowaniu warto również dla pewności jeszcze raz upewnić się, że pliki statyczne są załadowane.<br/>
@@ -116,17 +144,25 @@ python manage.py collectstatic
 </details></h3>
 
 # Działanie aplikacji na serwerze
-Można sprawdzić działanie aplikacji w:  
+<h3>Można sprawdzić działanie aplikacji w:</h3> 
 - https://ultradoba2024.pythonanywhere.com/
 
-Wykres:
+<h3>Wykres:</h3>
 - https://ultradoba2024.pythonanywhere.com/chart/line
+- <img src="readmeImages/chart.png?raw=true" alt="Wykres biegów">
 
-Tabelka z wynikami biegaczy:
+<h3>Tabela z wynikami biegaczy:</h3>
 - https://ultradoba2024.pythonanywhere.com/table/result
+- <img src="readmeImages/resultsTable.png?raw=true" alt="Tabela wyników biegaczy">
 
-Spersonalizowany panel administracyjny:
+<h3>Tabela wyników pojedyńczego biegacza:</h3>
+- https://ultradoba2024.pythonanywhere.com/table/runnerResults/1 (id biegacza)
+- <img src="readmeImages/singleRunnerResultsTable.png?raw=true" alt="Tabela wyników pojedyńczego biegacza">
+
+<h3>Spersonalizowany panel administracyjny:</h3>
 - https://ultradoba2024.pythonanywhere.com/admin/customAdmin
+- <img src="readmeImages/customAdminPanel.png?raw=true" alt="Spersonalizowany panel administracyjny">
 
-Domyślny panel administracyjny:
+<h3>Domyślny panel administracyjny:</h3>
 - https://ultradoba2024.pythonanywhere.com/admin
+- <img src="readmeImages/adminPanel.png?raw=true" alt="Domyślny panel administracyjny Django">

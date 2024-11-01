@@ -1,9 +1,8 @@
 from pathlib import Path
 
 from datetime import datetime, timedelta
-FIRST_DAY = datetime(2024, 11, 2)
+FIRST_DAY = datetime(2024, 11, 2, 21, 30)
 SECOND_DAY = FIRST_DAY + timedelta(days=1)
-DEFAULT_RUNS_START = datetime(2024, 11, 2, 21, 30)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
