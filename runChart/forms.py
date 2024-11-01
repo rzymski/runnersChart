@@ -9,4 +9,3 @@ class TimeForm(forms.Form):
 
 class MyTimeForm(forms.Form):
     time_input = forms.TimeField(widget=AdminTimeWidget(), label="mainTime", required=False)
-

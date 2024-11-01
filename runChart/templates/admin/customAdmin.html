@@ -9,6 +9,15 @@
             <script src="{% url 'js-catlog' %}"></script>
             <script src="{% static '/admin/js/core.js' %}"></script>
             <link rel="stylesheet" href="{% static 'admin/css/widgets.css' %}">
+
+            <style>
+                .clockbox.module {z-index: 9999; background-color: black; color: white}
+                .clockbox.module h2 {background-color: #264b5d; font-size: 1.5rem; padding: 0.2rem}
+                .calendar-cancel a {background-color: white; color: black ; font-size: 1.5rem}
+                .clockbox.module ul {font-size: 0.8rem;}
+                .timelist a:hover {font-size: 0.8rem; background-color: #264b5d}
+            </style>
+
         </head>
         <body>
             <div class="xd">
