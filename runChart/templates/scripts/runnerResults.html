@@ -16,7 +16,7 @@
            scrollCollapse: true, //zeby nie robilo durnych paskow przy zmniejszeniu tabeli przez filtrowanie
            scroller: true,
            //BUTTONS
-            dom: 'lBfrtip',
+            dom: 'lfrtBip',
             buttons: [
                 { //COPY
                     extend: 'copy',
@@ -25,7 +25,7 @@
                     titleAttr: 'Kopiuj',
                     title: 'Wyniki: ' + runnerName + ' ' + runnerSurname,
                     exportOptions: { //kolumny, które ma zkopiować
-                        columns: [0, 1, 2, 3, 4]
+                        columns: ':visible'
                     }
                 },
                 { //EXCEL
@@ -36,7 +36,7 @@
                     title: 'Wyniki: ' + runnerName + ' ' + runnerSurname,
                     filename: runnerName + runnerSurname + 'Result',
                     exportOptions: { //kolumny, które ma exportowac do excela
-                        columns: [0, 1, 2, 3, 4]
+                        columns: ':visible'
                     }
                 },
                 { //PRINT
@@ -46,7 +46,7 @@
                     titleAttr: 'Wydrukuj',
                     title: 'Wyniki: ' + runnerName + ' ' + runnerSurname,
                     exportOptions: { //kolumny, które ma wydrukować
-                        columns: [0, 1, 2, 3, 4]
+                        columns: ':visible'
                     },
                     //zmiana czcionki wydrukowanego textu
                     customize: function ( win ){
@@ -63,7 +63,7 @@
                     titleAttr: 'PDF',
                     filename: 'runnersResult',
                     exportOptions: { //kolumny, które ma exportowac do excela
-                        columns: [0, 1, 2, 3, 4]
+                        columns: ':visible'
                     },
                     //Wyśrodkowanie kolumn
                     tableHeader: {
@@ -81,8 +81,17 @@
                         doc.content[1].table.widths = Array(doc.content[1].table.body[1].length + 1).join('*').split('');
                     }
                 },
+                {
+                   extend: 'colvis',
+                   text: 'Wybrane kolumny',
+                    columnText: function (dt, idx, title) {
+                        return idx + 1 + ': ' + title;
+                    }
+               },
             ],
            language: {
+               zeroRecords: "Nie przebiegnięto jeszcze żadnego okrążenia.",
+               infoEmpty: "Nie znaleziono żadny pasującyh rekordów.",
                buttons: {
                    copyTitle: 'Skopiowano do schowka',
                    copySuccess: {
