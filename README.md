@@ -144,25 +144,25 @@ python manage.py collectstatic
 </details></h3>
 
 # Działanie aplikacji na serwerze
-<h3>Można sprawdzić działanie aplikacji w:</h3> 
-- https://ultradoba2024.pythonanywhere.com/
+**Można sprawdzić działanie aplikacji w:**
+ - https://ultradoba2024.pythonanywhere.com/
 
-<h3>Wykres:</h3>
+**Wykres:**
 - https://ultradoba2024.pythonanywhere.com/chart/line
-- <img src="readmeImages/chart.png?raw=true" alt="Wykres biegów">
+<img src="readmeImages/chart.png?raw=true" alt="Wykres biegów">
 
-<h3>Tabela z wynikami biegaczy:</h3>
+**Tabela z wynikami biegaczy:**
 - https://ultradoba2024.pythonanywhere.com/table/result
-- <img src="readmeImages/resultsTable.png?raw=true" alt="Tabela wyników biegaczy">
+<img src="readmeImages/resultsTable.png?raw=true" alt="Tabela wyników biegaczy">
 
-<h3>Tabela wyników pojedyńczego biegacza:</h3>
-- https://ultradoba2024.pythonanywhere.com/table/runnerResults/1 (id biegacza)
-- <img src="readmeImages/singleRunnerResultsTable.png?raw=true" alt="Tabela wyników pojedyńczego biegacza">
+**Tabela wyników pojedyńczego biegacza:**
+- https://ultradoba2024.pythonanywhere.com/table/runnerResults/1 *id biegacza*
+<img src="readmeImages/singleRunnerResultsTable.png?raw=true" alt="Tabela wyników pojedyńczego biegacza">
 
-<h3>Spersonalizowany panel administracyjny:</h3>
+**Spersonalizowany panel administracyjny:**
 - https://ultradoba2024.pythonanywhere.com/admin/customAdmin
-- <img src="readmeImages/customAdminPanel.png?raw=true" alt="Spersonalizowany panel administracyjny">
+<img src="readmeImages/customAdminPanel.png?raw=true" alt="Spersonalizowany panel administracyjny">
 
-<h3>Domyślny panel administracyjny:</h3>
+**Domyślny panel administracyjny:**
 - https://ultradoba2024.pythonanywhere.com/admin
-- <img src="readmeImages/adminPanel.png?raw=true" alt="Domyślny panel administracyjny Django">
+<img src="readmeImages/adminPanel.png?raw=true" alt="Domyślny panel administracyjny Django">
