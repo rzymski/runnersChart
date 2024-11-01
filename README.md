@@ -4,10 +4,10 @@ ___
 
 ## Zawartość REDME
 1. :runner: [Funkcjonalność](#funkcjonalność)
-2. :computer: [Uruchomienie lokalnie](#I=instrukcja-uruchomienia-lokalnie)
+2. :computer: [Uruchomienie lokalnie](#Instrukcja-uruchomienia-lokalnie)
 3. :wrench: [Konfiguracja lokalna](#konfiguracja-lokalna)
-4. :satellite: [Wdrożenie na serwer pythonanywhere](#wdrozenie-na-serwer-pythonanywhere)
-5. :globe_with_meridians: [Działanie aplikacji na serwerze](#dzialanie-aplikacji-na-serwerze)
+4. :satellite: [Wdrożenie na serwer pythonanywhere](#wdrożenie-na-serwer-pythonanywhere)
+5. :globe_with_meridians: [Działanie aplikacji na serwerze](#działanie-aplikacji-na-serwerze)
 
 # Funkcjonalność
 1) [x] Wykres z wynikami biegaczy
@@ -52,12 +52,12 @@ python manage.py migrate
 ```
 
 # Wdrożenie na serwer pythonanywhere:
-<h3><details>
-    <summary>Uruchomienie konsoli w pythonanywhere:</summary>
-        W sekcji **`Consoles`**<br/>
+<details>
+    <summary><h3>Uruchomienie konsoli w pythonanywhere:</h3></summary>
+        W sekcji <code>Consoles</code><br/>
         Uruchamiamy konsole:        
         <img src="redmeImages/launchConsole.png?raw=true" alt="uruchomienie konsoli w pythonanywhere">
-</details></h3>
+</details>
 
 Klonujemy repozytorium:
 ```sh
@@ -78,7 +78,7 @@ pip install -r ./runnersChart/requirements.txt
     <summary>Dodanie aplikacji do serwera:</summary>
         Add a new web app --> ... --> Manual Configuration --> Python 3.10 --> ...<br/>
         <img src="redmeImages/addApplication.png?raw=true" alt="Dodanie aplikacji do serwera">
-</details></h3><br/>
+</details></h3>
 
 <details>
 <summary><h3>Ustawienia w sekcji Web:</h3></summary>
