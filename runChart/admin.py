@@ -160,15 +160,15 @@ class RunningLapAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
         if obj is not None and obj.endLapDate is not None:
-            t = time(obj.endLapDate.hour, obj.endLapDate.minute)
-            dt = datetime.combine(datetime.today(), t)
-            dt += timedelta(hours=2)
-        endLapTimeValue = dt.time() if obj is not None and obj.endLapDate is not None else time(datetime.now().hour, datetime.now().minute, datetime.now().second)
+            end_local_dt = timezone.localtime(obj.endLapDate)
+            endLapTimeValue = end_local_dt.time()
+        else:
+            endLapTimeValue = timezone.localtime().time()
         if obj is not None and obj.startLapDate is not None:
-            t2 = time(obj.startLapDate.hour, obj.startLapDate.minute)
-            dt2 = datetime.combine(datetime.today(), t2)
-            dt2 += timedelta(hours=2)
-        startLapTimeValue = dt2.time() if obj is not None and obj.startLapDate is not None else time(datetime.now().hour, datetime.now().minute, datetime.now().second)
+            start_local_dt = timezone.localtime(obj.startLapDate)
+            startLapTimeValue = start_local_dt.time()
+        else:
+            startLapTimeValue = timezone.localtime().time()
         recommended_values = {
             'startLapTime': startLapTimeValue,
             'endLapTime': endLapTimeValue,

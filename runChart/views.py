@@ -5,6 +5,7 @@ from .functions import *
 from datetime import datetime, time, timedelta
 import pytz
 from .forms import *
+from django.utils import timezone
 
 from django.contrib.auth.models import auth
 from django.contrib import messages
@@ -42,8 +43,8 @@ def runnerResults(request, runnerId):
     results = []
     for run in runs:
         rank = get_actual_ranking(run)
-        startDate = run.startLapDate + timedelta(hours=2)
-        endDate = run.endLapDate + timedelta(hours=2)
+        startDate = timezone.localtime(run.startLapDate)
+        endDate = timezone.localtime(run.endLapDate)
         timeDelta = endDate - startDate
         results.append([run.numberOfLaps, startDate.strftime('%H:%M'), endDate.strftime('%H:%M'), timeDelta, rank])
     return render(request, 'table/runnerResults.html', {'runner': runner, 'runs': results, "table_script": 'tableRunnerResults'})

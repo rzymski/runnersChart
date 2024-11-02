@@ -1,6 +1,5 @@
 from .models import *
 from datetime import datetime, time, timedelta
-import pytz
 from django.db.models import Max, F, Q
 from django.utils import timezone
 from django.conf import settings
@@ -91,17 +90,11 @@ def get_runner_actual_laps_and_status():
     for lastRun in lastRuns:
         status = 'ZAKOŃCZYŁ' if lastRun.runnerId.finished else ('BIEGNIE' if lastRun.endLapDate is None else 'ODPOCZYWA')
         if status == 'BIEGNIE':
-            startLapDateDatetime = datetime(lastRun.startLapDate.year, lastRun.startLapDate.month, lastRun.startLapDate.day, lastRun.startLapDate.hour, lastRun.startLapDate.minute)
-            startLapDateDatetime += timedelta(hours=2)
-            # WERSJA ALTERNATYWNA NIE TRZEBA TIMEDELTA DLA startLapDateDatetime
-            # warsawEuropeTz = pytz.timezone("Europe/Warsaw")
-            # timeInWarsaw = datetime.now(warsawEuropeTz)
-            # currentTimeInWarsaw = timeInWarsaw.strftime("%H:%M:%S")
-            # print(f"EXPERYMENT Teraz datetime={datetime.now()} z strefa czasowo={currentTimeInWarsaw}")
-            timeDelta = datetime.now() - startLapDateDatetime
-            hours, remainder = divmod(timeDelta.seconds, 3600)
+            startLapDateDatetime = timezone.localtime(lastRun.startLapDate)
+            timeDelta = timezone.localtime() - startLapDateDatetime
+            hours, remainder = divmod(timeDelta.total_seconds(), 3600)
             minutes, _ = divmod(remainder, 60)
-            timeDeltaStr = f"{hours}h i {minutes} minut temu" if datetime.now() > startLapDateDatetime else "nie rozpoczeto jeszcze"
+            timeDeltaStr = f"{int(hours)}h i {int(minutes)} minut temu" if timezone.localtime() > startLapDateDatetime else "nie rozpoczeto jeszcze"
             result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps-1, timeDeltaStr, status])
         elif status == 'ODPOCZYWA':
             result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps, '_______________', status])
@@ -124,8 +117,7 @@ def get_runner_laps_and_records():
     for rank, lastRun in enumerate(lastRuns):
         shortestTime = get_best_time_for_runner(lastRun.runnerId)
         longestTime = get_longest_run_without_breaks_for_runner(lastRun.runnerId)
-        end = datetime(lastRun.endLapDate.year, lastRun.endLapDate.month, lastRun.endLapDate.day, lastRun.endLapDate.hour, lastRun.endLapDate.minute)
-        end += timedelta(hours=2)
+        end = timezone.localtime(lastRun.endLapDate)
         endTime = end.strftime("%Y-%m-%d  %H:%M")
         runsOfThisRunner = RunningLap.objects.filter(runnerId=lastRun.runnerId)
         status = 'ZAKOŃCZYŁ' if lastRun.runnerId.finished else ('BIEGNIE' if len(runsOfThisRunner) != lastRun.numberOfLaps else 'ODPOCZYWA')
@@ -203,18 +195,17 @@ def get_runners_laps_in_time():
     for i in range(Runner.objects.count()):
         result.append([])
     runningLaps = RunningLap.objects.all().order_by('startLapDate')
-    warsaw_tz = pytz.timezone('Europe/Warsaw')
 
     allRunners = list(Runner.objects.all())
 
     for run in runningLaps:
         if run.runnerId is not None:
-            start_lap_date_warsaw = run.startLapDate.astimezone(warsaw_tz)
+            start_lap_date_warsaw = timezone.localtime(run.startLapDate)
             runner = Runner.objects.get(pk=run.runnerId.id)
             index = allRunners.index(runner)
             result[index].append({'x': time(start_lap_date_warsaw.hour, start_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps - 1})
             if run.endLapDate is not None:
-                end_lap_date_warsaw = run.endLapDate.astimezone(warsaw_tz)
+                end_lap_date_warsaw = timezone.localtime(run.endLapDate)
                 result[index].append({'x': time(end_lap_date_warsaw.hour, end_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps})
     return result
 
@@ -224,8 +215,7 @@ def get_laps_for_every_time():
     runningLapEndDatesWithNones = list(RunningLap.objects.values_list('endLapDate', flat=True).distinct().order_by('endLapDate'))
     runningLapEndDates = list(filter(lambda x: x is not None, runningLapEndDatesWithNones))
     runningLapsDates = sorted(runningLapStartDates + runningLapEndDates)
-    europe_warsaw = pytz.timezone('Europe/Warsaw')
-    running_laps = [dt.astimezone(europe_warsaw) for dt in runningLapsDates]
+    running_laps = [timezone.localtime(dt) for dt in runningLapsDates]
     run_dict = {running_lap: [0] * Runner.objects.count() for running_lap in running_laps}
     runners = Runner.objects.all()
     for startLapDate in run_dict:
