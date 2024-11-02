@@ -64,11 +64,6 @@ SECOND_DAY = FIRST_DAY + timedelta(days=1)
 
 <h3>Przydatne polecenia:</h3>
 
-Tworzenie super użytkownika
-```sh
-python manage.py createsuperuser
-```
-
 Tworzenie migracji po zmianie modelów
 ```sh
 python manage.py makemigrations appName --name changeName
@@ -77,6 +72,11 @@ python manage.py makemigrations appName --name changeName
 Zatwierdzenie migracji
 ```sh
 python manage.py migrate  
+```
+
+Tworzenie super użytkownika
+```sh
+python manage.py createsuperuser
 ```
 
 # Wdrożenie na serwer pythonanywhere:
