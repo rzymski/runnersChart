@@ -51,12 +51,18 @@ def upload_csvFileUniversal(request, model_name):
                     obj_dict[header] = end_lap_date_obj
                 else:
                     obj_dict[header] = value
-            if model_name == "RunningLap":
+            if model_name == "Runner":
+                runner_instance = model(**obj_dict)
+                runner_instance.save()
+                # Tworzenie rekordu RunningLap dla każdego nowego biegacza
+                RunningLap.objects.create(runnerId=runner_instance, startLapDate=timezone.make_aware(FIRST_DAY), numberOfLaps=1)
+            elif model_name == "RunningLap":
                 admin_instance = RunningLapAdmin(model, admin.site)
                 admin_instance.save_model(request, model(**obj_dict), None, False)
             else:
                 instance = model(**obj_dict)
                 instance.save()
+
         url = reverse(f'admin:runChart_{model_name.lower()}_changelist')
         return HttpResponseRedirect(url)
     form = CsvImportForm()
