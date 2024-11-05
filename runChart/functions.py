@@ -125,7 +125,7 @@ def get_runner_laps_and_records():
 
     for runner in allRunners:
         if runner.id not in runnersWithLaps:
-            result.append([runner.id, runner.name, runner.surname, '___', 0, '_______', '_______', '___________________', "BIEGNIE"])
+            result.append([runner.id, runner.name, runner.surname, '___', 0, '_______', '_______', '___________________', ""])
 
     return result
 

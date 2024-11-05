@@ -5,6 +5,21 @@
            .addClass('filters')
            .appendTo('#example thead');
 
+       $.fn.dataTable.ext.type.order['ranking-pre'] = function(data) {
+           return data === "" || data === null || data === "___" ? Infinity : parseInt(data, 10);
+       };
+
+       // Definiowanie niestandardowego sortowania dla kolumny "Najdłuższy bieg bez przerwy"
+       $.fn.dataTable.ext.type.order['duration-pre'] = function(data) {
+           if (data === "" || data === null || data === "_______") {
+               return -Infinity; // Traktuj brakujące wartości jako najmniejsze, by były na końcu przy sortowaniu malejącym
+           }
+           var parts = data.split(":");
+           var hours = parseInt(parts[0], 10);
+           var minutes = parseInt(parts[1], 10);
+           return hours * 60 + minutes;
+       };
+
        var table = $('#example').DataTable({
            paging: true, //stronicowanie
            pageLength: 50,
@@ -19,6 +34,10 @@
            scroller: true,
 
            order: [[3, 'asc']],
+           columnDefs: [
+               { type: 'ranking', targets: 3 },
+               { type: 'duration', targets: 8 }
+           ],
 
            initComplete: function() {
                var api = this.api();

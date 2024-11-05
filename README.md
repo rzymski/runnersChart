@@ -79,6 +79,11 @@ Tworzenie super użytkownika
 python manage.py createsuperuser
 ```
 
+Włączenie shell-a w konsoli (pozwala na komunikacje z bazą danych przez ORM)
+```sh
+python manage.py shell
+```
+
 # Wdrożenie na serwer pythonanywhere:
 <details>
     <summary><h3>Uruchomienie konsoli w pythonanywhere:</h3></summary>
@@ -142,6 +147,12 @@ python manage.py collectstatic
     <summary>Przeładowanie aplikacji na serwerze:</summary>
         <img src="readmeImages/reloadSide.png?raw=true" alt="Przeladowanie aplikacji na serwerze">
 </details></h3>
+
+W przypadku wyłączenia się konsoli i zamknięcia wirtualnego środowiska, żeby włączyć spowrotem wirtualne środowisko<br/>
+W `/home/ultradoba2024/.virtualenvs`
+```sh
+workon venv
+```
 
 # Działanie aplikacji na serwerze
 **Można sprawdzić działanie aplikacji w:**
