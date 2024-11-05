@@ -148,8 +148,7 @@ python manage.py collectstatic
         <img src="readmeImages/reloadSide.png?raw=true" alt="Przeladowanie aplikacji na serwerze">
 </details></h3>
 
-W przypadku wyłączenia się konsoli i zamknięcia wirtualnego środowiska, żeby włączyć spowrotem wirtualne środowisko<br/>
-W `/home/ultradoba2024/.virtualenvs`
+W przypadku wyłączenia się konsoli i zamknięcia wirtualnego środowiska, żeby włączyć z powrotem wirtualne środowisko w `/home/ultradoba2024/.virtualenvs`:
 ```sh
 workon venv
 ```
