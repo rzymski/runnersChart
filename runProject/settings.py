@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from datetime import datetime, timedelta
-FIRST_DAY = datetime(2024, 11, 2, 21, 30)
+FIRST_DAY = datetime(2025, 10, 25, 21, 30)
 SECOND_DAY = FIRST_DAY + timedelta(days=1)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -13,7 +13,7 @@ SECRET_KEY = "django-insecure-g4eh8y8#cwxsu+%m-k!#*ji(ch1wf6dq)hel791ebon44%0^j^
 # SECURITY WARNING: don't chart with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['nocnybieg2023.pythonanywhere.com', 'ultradoba2024.pythonanywhere.com', '127.0.0.1']
+ALLOWED_HOSTS = ['nocnybieg2023.pythonanywhere.com', 'ultradoba2024.pythonanywhere.com', 'ultradoba2025.pythonanywhere.com', '127.0.0.1']
 
 
 # Application definition
