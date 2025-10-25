@@ -63,7 +63,7 @@ SECOND_DAY = FIRST_DAY + timedelta(days=1)
 </details>
 
 > [!Important]
-> ### W **`settings.py`** do **`ALLOWED_HOSTS`** dodajemy adres url, gdzie będzie wystawiona aplikacja:
+> ### W **`settings.py`** do **`ALLOWED_HOSTS`** dodać adres url, gdzie będzie wystawiona aplikacja:
 > np. 'nocnybieg2023.pythonanywhere.com', 'ultradoba2024.pythonanywhere.com', 'ultradoba2025.pythonanywhere.com'.
 
 <h3>Przydatne polecenia:</h3>
