@@ -153,6 +153,11 @@ W przypadku wyłączenia się konsoli i zamknięcia wirtualnego środowiska, że
 workon venv
 ```
 
+Może wystąpić potrzeba zmigrowania, dla poprawnego działania aplikacji:
+```sh
+python manage.py migrate
+```
+
 # Działanie aplikacji na serwerze
 **Można sprawdzić działanie aplikacji w:**
  - https://ultradoba2024.pythonanywhere.com/
