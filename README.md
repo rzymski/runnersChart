@@ -62,6 +62,10 @@ SECOND_DAY = FIRST_DAY + timedelta(days=1)
 <img src="readmeImages/settings.png?raw=true" alt="Wybranie daty biegu w ustawieniach kodu">
 </details>
 
+> [!Important]
+> ### W **`settings.py`** do **`ALLOWED_HOSTS`** dodajemy adres url, gdzie będzie wystawiona aplikacja:
+> np. 'nocnybieg2023.pythonanywhere.com', 'ultradoba2024.pythonanywhere.com', 'ultradoba2025.pythonanywhere.com'.
+
 <h3>Przydatne polecenia:</h3>
 
 Tworzenie migracji po zmianie modelów
