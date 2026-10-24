@@ -160,16 +160,12 @@ W przypadku wyłączenia się konsoli i zamknięcia wirtualnego środowiska, że
 workon venv
 ```
 
-**Przy pierwszym wdrożeniu wykonanie migracji jest konieczne** (tworzą tabele bazy danych). Uruchom w katalogu z `manage.py`:
+**Przy pierwszym wdrożeniu wykonanie migracji jest konieczne** (tworzy tabele bazy danych)
 ```sh
 python manage.py migrate
 ```
 
 # Kopia zapasowa bazy SQLite na PythonAnywhere
-
-Aplikacja przechowuje zawodników, okrążenia, czasy oraz konta Django w pliku `db.sqlite3`. Szczególnie podczas biegu należy regularnie wykonywać kopie i **pobierać je na swój komputer** — kopia pozostawiona wyłącznie na tym samym serwerze nie zabezpiecza przed utratą konta lub danych serwera.
-
-## Tworzenie kopii na serwerze
 
 1. Na PythonAnywhere otwórz **Consoles → Bash**.
 2. Przejdź do katalogu projektu (tam, gdzie jest `manage.py` i `db.sqlite3`):
@@ -190,12 +186,9 @@ Aplikacja przechowuje zawodników, okrążenia, czasy oraz konta Django w pliku 
    sqlite3 db.sqlite3 ".backup 'backups/db-$(date +%Y-%m-%d_%H-%M-%S).sqlite3'"
    ```
 
-## Pobieranie kopii na własny komputer
-
-1. W panelu PythonAnywhere wejdź w **Files**.
-2. Otwórz katalog projektu `runnersChart`, a następnie `backups`.
-3. Kliknij opcję **Download** przy wybranym pliku `.sqlite3` i zapisz go na komputerze.
-4. Dobrze jest zachować nazwę zawierającą datę i przechowywać kopie w osobnym miejscu niż projekt.
+5. W panelu PythonAnywhere wejdź w **Files**.
+6. Otwórz katalog projektu `runnersChart`, a następnie `backups`.
+7. Kliknij opcję **Download** przy wybranym pliku `.sqlite3` i zapisz go na komputerze.
 
 # Działanie aplikacji na serwerze
 
