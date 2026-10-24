@@ -1,0 +1,56 @@
+/* Wykres HTML/CSS, bez dodatkowych bibliotek graficznych. */
+.hm-page { --hm-name-width: 255px; --hm-count-width: 65px; }
+.hm-overview { display: flex; flex-wrap: wrap; justify-content: end; gap: .5rem 1.3rem; }
+.hm-toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
+.hm-toolbar > div:first-child { width: min(300px, 100%); }
+.hm-toolbar > div:nth-child(2) { width: min(260px, 100%); }
+.hm-toolbar-info { padding-bottom: 5px; }
+.hm-legend { display: flex; gap: 8px 13px; flex-wrap: wrap; font-size: 12px; }
+.hm-legend-item { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.hm-swatch { width: 13px; height: 13px; border: 1px solid rgba(0,0,0,.15); border-radius: 3px; display: inline-block; }
+.hm-scroll { max-height: min(72vh, 790px); min-height: 220px; overflow: auto; border: 1px solid #ccd2d8; border-radius: 6px; position: relative; background: white; }
+.hm-grid { display: grid; grid-template-columns: var(--hm-name-width) var(--hm-count-width) minmax(var(--hm-axis-width), 1fr); min-width: calc(var(--hm-name-width) + var(--hm-count-width) + var(--hm-axis-width)); }
+.hm-header { position: sticky; top: 0; z-index: 5; background: #eaf1f6; border-bottom: 2px solid #b8c5d1; height: 54px; font-weight: 600; font-size: 12px; }
+.hm-runner-header, .hm-count-header { display: flex; align-items: center; justify-content: start; background: #eaf1f6; }
+.hm-runner-header { position: sticky; left: 0; z-index: 8; padding-left: 13px; border-right: 1px solid #ced8e2; }
+.hm-count-header { position: sticky; left: var(--hm-name-width); z-index: 8; justify-content: center; border-right: 2px solid #bac8d5; }
+.hm-axis { position: relative; margin: 0 12px; }
+.hm-axis-tick { position: absolute; top: 8px; display: flex; flex-direction: column; align-items: center; gap: 2px; font-variant-numeric: tabular-nums; line-height: 16px; white-space: nowrap; transform: translateX(-50%); }
+.hm-axis-tick::after { content: ""; position: absolute; top: 24px; left: 50%; height: 17px; border-left: 1px solid #9eacb9; }
+.hm-axis-start { transform: none; }
+.hm-axis-end { transform: translateX(-100%); }
+.hm-axis-tick small { font-weight: 500; font-size: 10px; color: #557; }
+.hm-row { height: 33px; font-size: 12px; border-bottom: 1px solid #e0e5e9; }
+.hm-row:nth-child(even) .hm-runner, .hm-row:nth-child(even) .hm-count { background: #f7f9fa; }
+.hm-row:hover .hm-runner, .hm-row:hover .hm-count { background: #fff4d5; }
+.hm-runner, .hm-count { display: flex; align-items: center; background: white; white-space: nowrap; }
+.hm-runner { position: sticky; left: 0; z-index: 2; padding: 0 9px; border-right: 1px solid #e0e5e9; overflow: hidden; }
+.hm-runner a { color: #1b405e; overflow: hidden; text-overflow: ellipsis; text-decoration: none; }
+.hm-runner a:hover { text-decoration: underline; }
+.hm-number { color: #596875; font-variant-numeric: tabular-nums; font-weight: 700; margin-right: 5px; }
+.hm-finished { margin-left: auto; padding-left: 4px; font-weight: bold; color: #12804a; }
+.hm-count { position: sticky; left: var(--hm-name-width); z-index: 2; justify-content: center; font-weight: 700; font-variant-numeric: tabular-nums; border-right: 2px solid #bac8d5; }
+.hm-track { margin: 3px 12px; height: 26px; position: relative; background: #e9ecef; }
+.hm-segment { position: absolute; top: 0; bottom: 0; cursor: crosshair; }
+.hm-segment:hover { outline: 2px solid rgba(0,0,0,.6); outline-offset: -2px; z-index: 2; }
+.hm-gridline { position: absolute; top: 0; bottom: 0; border-left: 1px solid rgba(0,0,0,.14); pointer-events: none; z-index: 1; }
+.hm-band-0 { background-color: #e9ecef; }
+.hm-band-1 { background-color: #ef4444; }
+.hm-band-2 { background-color: #f97316; }
+.hm-band-3 { background-color: #facc15; }
+.hm-band-4 { background-color: #84cc16; }
+.hm-band-5 { background-color: #22c55e; }
+.hm-band-6 { background-color: #14b8a6; }
+.hm-band-7 { background-color: #0ea5e9; }
+.hm-band-8 { background-color: #6366f1; }
+.hm-band-9 { background-color: #a855f7; }
+.hm-band-10 { background-color: #be185d; }
+.hm-tooltip { position: fixed; z-index: 50; pointer-events: none; padding: 9px 12px; border-radius: 5px; box-shadow: 0 4px 18px rgba(0,0,0,.23); color: #fff; background: #1f2937; font-size: 12px; line-height: 1.5; white-space: pre-line; max-width: 300px; }
+@media (max-width: 680px) {
+    .hm-page { --hm-name-width: 185px; --hm-count-width: 48px; }
+    .hm-grid { grid-template-columns: var(--hm-name-width) var(--hm-count-width) minmax(var(--hm-axis-width), 1fr); min-width: calc(var(--hm-name-width) + var(--hm-count-width) + var(--hm-axis-width)); }
+    .hm-overview { justify-content: start; }
+    .hm-runner { padding: 0 5px; }
+}
+
+.hm-row[hidden] { display: none !important; }
