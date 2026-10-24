@@ -115,4 +115,48 @@
         </table>
     </div>
 </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const controls = Array.from(document.querySelectorAll('.race-time-line'))
+        .map(line => ({
+            input: line.querySelector('.race-clock input.vTimeField'),
+            label: line.querySelector('.race-fold')
+        }))
+        .filter(control => control.input && control.label);
+
+    function updateCheckbox(control) {
+        const time = control.input.value.trim();
+        const isSecondHour = /^0?2:[0-5]\d(?::[0-5]\d)?$/.test(time);
+
+        control.label.style.display = isSecondHour ? '' : 'none';
+
+        if (!isSecondHour) {
+            const checkbox = control.label.querySelector('input[type="checkbox"]');
+            if (checkbox) checkbox.checked = false;
+        }
+    }
+
+    function updateAll() {
+        controls.forEach(updateCheckbox);
+    }
+
+    controls.forEach(control => {
+        control.input.addEventListener('input', () => updateCheckbox(control));
+        control.input.addEventListener('change', () => updateCheckbox(control));
+    });
+
+    // Obsługa widgetów Django Admin: Now i zegarek.
+    document.addEventListener('click', event => {
+        if (event.target.closest('.datetimeshortcuts, .clockbox')) {
+            setTimeout(updateAll, 0);
+        }
+    });
+
+    updateAll();
+});
+</script>
+
+
 {% endblock %}

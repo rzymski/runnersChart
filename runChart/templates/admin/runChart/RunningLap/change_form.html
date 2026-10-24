@@ -1,0 +1,80 @@
+
+{% extends "admin/change_form.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+
+<style>
+    .race-second-hour { display: inline-flex !important; align-items: center; gap: 4px; float: none !important; width: auto !important; margin: 0 0 0 10px !important; padding: 0 !important; font-size: 12px; font-weight: normal; line-height: 1; color: var(--body-fg); vertical-align: middle; white-space: nowrap; cursor: pointer; }
+    .race-second-hour input[type="checkbox"] { position: static !important; width: 16px; height: 16px; margin: 0 !important; padding: 0; vertical-align: middle; cursor: pointer; }
+    .race-second-hour[hidden] { display: none !important; }
+</style>
+
+<script>
+window.addEventListener('load', function () {
+    const refreshFunctions = [];
+
+    function setupSecondHour(timeFieldId, checkboxId) {
+        const timeInput = document.getElementById(timeFieldId);
+        const checkbox = document.getElementById(checkboxId);
+
+        if (!timeInput || !checkbox) return;
+
+        // Zachowujemy istniejący checkbox Django.
+        const originalRow = checkbox.closest('.form-row');
+
+        const label = document.createElement('label');
+        label.className = 'race-second-hour';
+        label.title = 'Drugie wystąpienie godziny 02:00–02:59, po cofnięciu zegara';
+
+        checkbox.setAttribute('aria-label', label.title);
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(' II'));
+
+        // Umieszczamy checkbox ZA widgetami Now i zegarka,
+        // aby nie zakłócić ich działania.
+        const shortcuts = timeInput.parentElement.querySelector('.datetimeshortcuts');
+
+        if (shortcuts) {
+            shortcuts.insertAdjacentElement('afterend', label);
+        } else {
+            timeInput.insertAdjacentElement('afterend', label);
+        }
+
+        // Ukrywamy pusty wiersz po przeniesionym checkboxie.
+        if (originalRow) {
+            originalRow.style.display = 'none';
+        }
+
+        function refresh() {
+            const isSecondHour = /^0?2:[0-5]\d(?::[0-5]\d)?$/.test(timeInput.value.trim());
+
+            label.hidden = !isSecondHour;
+
+            if (!isSecondHour) {
+                checkbox.checked = false;
+            }
+        }
+
+        timeInput.addEventListener('input', refresh);
+        timeInput.addEventListener('change', refresh);
+
+        refreshFunctions.push(refresh);
+        refresh();
+    }
+
+    setupSecondHour('id_startLapTime', 'id_startAfterChange');
+    setupSecondHour('id_endLapTime', 'id_endAfterChange');
+
+    // Obsługa godzin wybieranych przez widget Django Admin.
+    document.addEventListener('click', function (event) {
+        if (event.target.closest('.datetimeshortcuts, .clockbox')) {
+            setTimeout(function () {
+                refreshFunctions.forEach(refresh => refresh());
+            }, 0);
+        }
+    });
+});
+</script>
+{% endblock %}
