@@ -168,13 +168,13 @@ python manage.py migrate
 # Kopia zapasowa bazy SQLite na PythonAnywhere
 
 1. Na PythonAnywhere otwórz **Consoles → Bash**.
-2. Przejdź do katalogu projektu (tam, gdzie jest `manage.py` i `db.sqlite3`):
+2. Przejdź do katalogu projektu:
 
    ```bash
    cd ~/runnersChart
    ```
 
-3. Utwórz katalog na kopie (wystarczy zrobić to raz):
+3. Utwórz katalog na kopie:
 
    ```bash
    mkdir -p backups
@@ -191,9 +191,6 @@ python manage.py migrate
 7. Kliknij opcję **Download** przy wybranym pliku `.sqlite3` i zapisz go na komputerze.
 
 # Działanie aplikacji na serwerze
-
-**Adres aplikacji:** 
- - https://ultradoba2026.pythonanywhere.com/
 
 ## Strona główna
 - https://ultradoba2026.pythonanywhere.com/
