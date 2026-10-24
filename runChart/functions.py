@@ -3,12 +3,13 @@ from datetime import datetime, time, timedelta
 from django.db.models import Max, F, Q
 from django.utils import timezone
 from django.conf import settings
+from .race_time import race_datetime, utc_elapsed, local_clock_label, is_ambiguous
 
 FIRST_DAY = settings.FIRST_DAY
 SECOND_DAY = settings.SECOND_DAY
 
 
-def save_multiple_runningLaps(runnerIds, time_str):
+def save_multiple_runningLaps(runnerIds, time_str, second_hour=False):
     if time_str is None or time_str == '':
         return "Nie podano czasu"
     try:
@@ -23,64 +24,64 @@ def save_multiple_runningLaps(runnerIds, time_str):
     for runnerId in runnerIds:
         lap = RunningLap.objects.filter(runnerId=int(runnerId)).latest('startLapDate')
         if lap.endLapDate is None:
-            error = try_save_runningLap(int(runnerId), None, timeValue)
+            error = try_save_runningLap(int(runnerId), None, timeValue, end_second_hour=second_hour)
         else:
-            error = try_save_runningLap(int(runnerId), timeValue, None)
+            error = try_save_runningLap(int(runnerId), timeValue, None, start_second_hour=second_hour)
         if error:
             errorInformation.append(error)
     return errorInformation
 
 
-def try_save_runningLap(runnerId, startTime=None, endTime=None):
+def try_save_runningLap(runnerId, startTime=None, endTime=None, start_second_hour=False, end_second_hour=False):
     errorTime = startTime if startTime is not None else endTime
     if startTime and time(21, 00) > startTime > time(12, 30) or endTime and time(21, 00) > endTime > time(12, 30):
         return f"Podano zly czas {errorTime}. Wyscig nie trwa pomiedzy 12:30 i 21:00, bo to nocny bieg."
     runner = Runner.objects.get(pk=runnerId)
     errorInformation = None
     if startTime:
-        errorInformation = save_running_lap(runner, startTime)
+        errorInformation = save_running_lap(
+            runner, startTime, start_second_hour=start_second_hour
+        )
     elif endTime:
-        lap = RunningLap.objects.filter(runnerId=runnerId).latest('startLapDate')
-        if endTime >= time(21, 30):
-            endLapDate = timezone.make_aware(
-                datetime(FIRST_DAY.year, FIRST_DAY.month, FIRST_DAY.day, endTime.hour, endTime.minute))
-        else:
-            endLapDate = timezone.make_aware(
-                datetime(SECOND_DAY.year, SECOND_DAY.month, SECOND_DAY.day, endTime.hour, endTime.minute))
+        lap = RunningLap.objects.filter(runnerId=runnerId).order_by('-startLapDate').first()
+        if lap is None:
+            return f'Zawodnik {runner} nie ma rozpoczętego okrążenia.'
+        if lap.endLapDate is not None:
+            return f'Zawodnik {runner} nie ma otwartego okrążenia.'
+        try:
+            endLapDate = race_datetime(endTime, end_second_hour)
+        except ValueError as exc:
+            return str(exc)
         if endLapDate >= lap.startLapDate:
             lap.endLapDate = endLapDate
-            lap.save()
+            lap.save(update_fields=['endLapDate'])
         else:
-            errorInformation = f"Podano zly czas {errorTime}. Zawodnik {runner} nie moze zakonczyc okrazenia przed jego rozpoczeciem"
+            errorInformation = (f"Podano zly czas {errorTime}. Zawodnik {runner} "
+                                "nie moze zakonczyc okrazenia przed jego rozpoczeciem")
     else:
         errorInformation = "Nie otrzymano ani czasu rozpoczecia ani zakonczenia"
-    return errorInformation if errorInformation is not None else None
+    return errorInformation
 
 
-def save_running_lap(runner, start_lap_time, end_lap_time=None):
-    startLapDate = None
-    endLapDate = None
-    if start_lap_time >= time(21, 30):
-        startLapDate = timezone.make_aware(
-            datetime(FIRST_DAY.year, FIRST_DAY.month, FIRST_DAY.day, start_lap_time.hour, start_lap_time.minute))
-    else:
-        startLapDate = timezone.make_aware(
-            datetime(SECOND_DAY.year, SECOND_DAY.month, SECOND_DAY.day, start_lap_time.hour, start_lap_time.minute))
-    if end_lap_time is not None:
-        if end_lap_time >= time(21, 30):
-            endLapDate = timezone.make_aware(
-                datetime(FIRST_DAY.year, FIRST_DAY.month, FIRST_DAY.day, end_lap_time.hour, end_lap_time.minute))
-        else:
-            endLapDate = timezone.make_aware(
-                datetime(SECOND_DAY.year, SECOND_DAY.month, SECOND_DAY.day, end_lap_time.hour, end_lap_time.minute))
-    errorQuery = Q(runnerId=runner, endLapDate__gt=startLapDate)
-    numberOfErrorLaps = RunningLap.objects.filter(errorQuery).count()
-    if numberOfErrorLaps > 0:
-        return f"Podano zly czas {start_lap_time}. Zawodnik {runner} nie moze zaczynac okrazenia przed zakonczeniem poprzedniego"
-    query = Q(runnerId=runner, startLapDate__lt=startLapDate)
-    numberOfLaps = RunningLap.objects.filter(query).count() + 1
-    new_running_lap = RunningLap(runnerId=runner, startLapDate=startLapDate, endLapDate=endLapDate, numberOfLaps=numberOfLaps)
-    new_running_lap.save()
+def save_running_lap(runner, start_lap_time, end_lap_time=None,
+                     start_second_hour=False, end_second_hour=False):
+    try:
+        startLapDate = race_datetime(start_lap_time, start_second_hour)
+        endLapDate = race_datetime(end_lap_time, end_second_hour)
+    except ValueError as exc:
+        return str(exc)
+    if endLapDate is not None and endLapDate < startLapDate:
+        return f"Podano zly czas {end_lap_time}. Koniec okrazenia poprzedza poczatek."
+    if RunningLap.objects.filter(runnerId=runner, endLapDate__gt=startLapDate).exists():
+        return (f"Podano zly czas {start_lap_time}. Zawodnik {runner} "
+                "nie moze zaczynac okrazenia przed zakonczeniem poprzedniego")
+    if RunningLap.objects.filter(runnerId=runner, endLapDate__isnull=True).exists():
+        return f"Zawodnik {runner} ma juz otwarte okrazenie."
+    numberOfLaps = RunningLap.objects.filter(
+        runnerId=runner, startLapDate__lt=startLapDate
+    ).count() + 1
+    RunningLap.objects.create(runnerId=runner, startLapDate=startLapDate,
+                              endLapDate=endLapDate, numberOfLaps=numberOfLaps)
     return None
 
 
@@ -90,11 +91,11 @@ def get_runner_actual_laps_and_status():
     for lastRun in lastRuns:
         status = 'ZAKOŃCZYŁ' if lastRun.runnerId.finished else ('BIEGNIE' if lastRun.endLapDate is None else 'ODPOCZYWA')
         if status == 'BIEGNIE':
-            startLapDateDatetime = timezone.localtime(lastRun.startLapDate)
-            timeDelta = timezone.localtime() - startLapDateDatetime
+            startLapDateDatetime = lastRun.startLapDate
+            timeDelta = utc_elapsed(startLapDateDatetime, timezone.now())
             hours, remainder = divmod(timeDelta.total_seconds(), 3600)
             minutes, _ = divmod(remainder, 60)
-            timeDeltaStr = f"{int(hours)}h i {int(minutes)} minut temu" if timezone.localtime() > startLapDateDatetime else "nie rozpoczeto jeszcze"
+            timeDeltaStr = f"{int(hours)}h i {int(minutes)} minut temu" if timezone.now() > startLapDateDatetime else "nie rozpoczeto jeszcze"
             result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps-1, timeDeltaStr, status])
         elif status == 'ODPOCZYWA':
             result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, lastRun.numberOfLaps, '_______________', status])
@@ -109,7 +110,7 @@ def get_runner_actual_laps_and_status():
 def get_runner_laps_and_records():
     result = []
     lastRuns = get_last_run_for_every_runner(True)
-    lastRuns = sorted(lastRuns, key=lambda run: (-run.numberOfLaps, str(run.endLapDate)))
+    lastRuns = sorted(lastRuns, key=lambda run: (-run.numberOfLaps, run.endLapDate))
 
     allRunners = Runner.objects.all()
     runnersWithLaps = {run.runnerId.id for run in lastRuns}
@@ -119,6 +120,8 @@ def get_runner_laps_and_records():
         longestTime = get_longest_run_without_breaks_for_runner(lastRun.runnerId)
         end = timezone.localtime(lastRun.endLapDate)
         endTime = end.strftime("%Y-%m-%d  %H:%M")
+        if is_ambiguous(end):
+            endTime += ' (II)' if end.fold else ' (I)'
         runsOfThisRunner = RunningLap.objects.filter(runnerId=lastRun.runnerId)
         status = 'ZAKOŃCZYŁ' if lastRun.runnerId.finished else ('BIEGNIE' if len(runsOfThisRunner) != lastRun.numberOfLaps else 'ODPOCZYWA')
         result.append([lastRun.runnerId.id, lastRun.runnerId.name, lastRun.runnerId.surname, rank+1, lastRun.numberOfLaps, shortestTime, longestTime, endTime, status])
@@ -144,10 +147,10 @@ def get_longest_run_without_breaks_for_runner(runnerId):
     for run in runs:
         if previous_run_end is None:
             previous_run_end = run.startLapDate
-        if previous_run_end.hour == run.startLapDate.hour and previous_run_end.minute == run.startLapDate.minute and run.endLapDate is not None:
-            current_time += run.endLapDate - run.startLapDate
+        if previous_run_end == run.startLapDate and run.endLapDate is not None:
+            current_time += utc_elapsed(run.startLapDate, run.endLapDate)
         elif previous_run_end != run.startLapDate and run.endLapDate is not None:
-            current_time = run.endLapDate - run.startLapDate
+            current_time = utc_elapsed(run.startLapDate, run.endLapDate)
         else:
             break
         if current_time > longest_time:
@@ -160,7 +163,7 @@ def get_best_time_for_runner(runnerId):
     runs = RunningLap.objects.filter(runnerId=runnerId)
     shortest_time = timedelta.max if runs else None
     for run in runs:
-        run_time = run.endLapDate - run.startLapDate if run.endLapDate is not None else None
+        run_time = utc_elapsed(run.startLapDate, run.endLapDate) if run.endLapDate is not None else None
         if run_time is not None and run_time < shortest_time:
             shortest_time = run_time
     if shortest_time == timedelta.max:
@@ -200,13 +203,11 @@ def get_runners_laps_in_time():
 
     for run in runningLaps:
         if run.runnerId is not None:
-            start_lap_date_warsaw = timezone.localtime(run.startLapDate)
             runner = Runner.objects.get(pk=run.runnerId.id)
             index = allRunners.index(runner)
-            result[index].append({'x': time(start_lap_date_warsaw.hour, start_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps - 1})
+            result[index].append({'x': local_clock_label(run.startLapDate), 'y': run.numberOfLaps - 1})
             if run.endLapDate is not None:
-                end_lap_date_warsaw = timezone.localtime(run.endLapDate)
-                result[index].append({'x': time(end_lap_date_warsaw.hour, end_lap_date_warsaw.minute).strftime('%H:%M'), 'y': run.numberOfLaps})
+                result[index].append({'x': local_clock_label(run.endLapDate), 'y': run.numberOfLaps})
     return result
 
 
@@ -215,8 +216,8 @@ def get_laps_for_every_time():
     runningLapEndDatesWithNones = list(RunningLap.objects.values_list('endLapDate', flat=True).distinct().order_by('endLapDate'))
     runningLapEndDates = list(filter(lambda x: x is not None, runningLapEndDatesWithNones))
     runningLapsDates = sorted(runningLapStartDates + runningLapEndDates)
-    running_laps = [timezone.localtime(dt) for dt in runningLapsDates]
-    run_dict = {running_lap: [0] * Runner.objects.count() for running_lap in running_laps}
+    # Keep UTC instants as keys: local wall times with fold=0/1 can compare equal.
+    run_dict = {dt: [0] * Runner.objects.count() for dt in runningLapsDates}
     runners = Runner.objects.all()
     for startLapDate in run_dict:
         for index, runner in enumerate(runners):

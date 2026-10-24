@@ -1,115 +1,118 @@
 {% extends 'partials/base.html' %}
-
+{% load static %}
 {% block content %}
-    <div>
-        <head>
-            {% load static %}
-            <title>Panel administratorski</title>
+<script src="{% url 'js-catlog' %}"></script>
+<script src="{% static 'admin/js/core.js' %}"></script>
+<link rel="stylesheet" href="{% static 'admin/css/widgets.css' %}">
 
-            <script src="{% url 'js-catlog' %}"></script>
-            <script src="{% static '/admin/js/core.js' %}"></script>
-            <link rel="stylesheet" href="{% static 'admin/css/widgets.css' %}">
+<style>
+    .clockbox.module { z-index: 9999; background-color: black; color: white; }
+    .clockbox.module h2 { background-color: #264b5d; font-size: 1.5rem; padding: .2rem; }
+    .calendar-cancel a { background-color: white; color: black; font-size: 1.5rem; }
+    .clockbox.module ul { font-size: .8rem; }
+    .timelist a:hover { font-size: .8rem; background-color: #264b5d; }
 
-            <style>
-                .clockbox.module {z-index: 9999; background-color: black; color: white}
-                .clockbox.module h2 {background-color: #264b5d; font-size: 1.5rem; padding: 0.2rem}
-                .calendar-cancel a {background-color: white; color: black ; font-size: 1.5rem}
-                .clockbox.module ul {font-size: 0.8rem;}
-                .timelist a:hover {font-size: 0.8rem; background-color: #264b5d}
-            </style>
+    .race-time-line { display: inline-flex !important; align-items: center !important; flex-wrap: nowrap !important; gap: 6px; white-space: nowrap; vertical-align: middle; }
+    .race-fold { display: inline-flex; align-items: center; justify-content: center; gap: 3px; margin: 0 !important; padding: 0; font-size: 12px; line-height: 1; color: #333; white-space: nowrap; cursor: pointer; flex: 0 0 auto; }
+    .race-fold input[type="checkbox"] { width: 20px; height: 20px; margin: 0 !important; padding: 0; cursor: pointer; }
 
-        </head>
-        <body>
-            <div class="xd">
-                <br>
-                <form method="post">
-                    {% csrf_token %}
-                    <div style="width: 95%; margin-left: auto; margin-right: auto">
-                        <div style="float: left;">
-                            <span style="display: inline-block;">
-                                {{ mainTime.time_input }}
-                            </span>
-                            <button type="submit" name="checkBoxSubmit" id="checkBoxSubmit" class="btn btn-danger text-center" title="checkBox">
-                                <i class="fa-solid fa-person-running"></i>
-                                Rozpocznij/Zakoncz biegi
-                            </button>
-                        </div>
-                    </div>
-                    <div style="clear: both;"></div>
-                    <div class="TableContainer">
-                        <table class="table table-bordered table-striped table-hover table-responsive" id="example" style="text-align: center;">
-                            <thead class="table-success">
-                                <tr>
-                                    <th style="width: 5%; color: transparent"></th>
-                                    <th style="width: 5%;">ID</th>
-                                    <th style="width: 10%;">Imie</th>
-                                    <th style="width: 15%;">Nazwisko</th>
-                                    <th style="width: 10%;">Liczba okrazen</th>
-                                    <th style="width: 15%;">Aktualny stan</th>
-                                    <th style="width: 15%;">Czas rozpoczecia okrazenia</th>
-                                    <th style="width: 25%;">Rozpocznij/Zakoncz Bieg</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for lastRun in lastRunsData %}
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" name="selected_items" value="{{ lastRun.0 }}">
-                                    </td>
-                                    <td>{{ lastRun.0 }}</td>
-                                    <td>{{ lastRun.1 }}</td>
-                                    <td>{{ lastRun.2 }}</td>
-                                    <td>{{ lastRun.3 }}</td>
-                                    {% if lastRun.5 == 'ODPOCZYWA' %}
-                                        <td style="color: blue">{{ lastRun.5 }}</td>
-                                    {% elif lastRun.5 == 'BIEGNIE' %}
-                                        <td style="color: red">{{ lastRun.5 }}</td>
-                                    {% else %}
-                                        <td>{{ lastRun.5 }}</td>
-                                    {% endif %}
-                                    <td>{{ lastRun.4 }}</td>
-                                    <td>
-                                        {% if lastRun.5 == 'ODPOCZYWA' %}
-                                            <form method="post" style="align-items: center">
-                                                {% csrf_token %}
-                                                {% if forloop.first %}
-                                                    {{ lastRun.6.media }}
-                                                {% endif %}
-                                                <div>
-                                                    <span style="display: inline-block;">
-                                                        {{ lastRun.6.start_time_input }}
-                                                        {{ lastRun.6.end_time_input.as_hidden }}
-                                                    </span>
-                                                    <button type="submit" name="singleInputSubmit" id="submit" class="btn btn-primary text-center rounded-circle" title="start">
-                                                        <i class="fa-solid fa-play"></i>
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        {% elif lastRun.5 == 'BIEGNIE' %}
-                                            <form method="post" style="align-items: center">
-                                                {% csrf_token %}
-                                                {% if forloop.first %}
-                                                    {{ lastRun.6.media }}
-                                                {% endif %}
-                                                <div>
-                                                    <span style="display: inline-block;">
-                                                        {{ lastRun.6.start_time_input.as_hidden }}
-                                                        {{ lastRun.6.end_time_input }}
-                                                    </span>
-                                                    <button type="submit" name="singleInputSubmit" id="submit" class="btn btn-danger text-center" title="stop">
-                                                        <i class="fa-solid fa-stop"></i>
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </form>
-            </div>
-        </body>
+    .race-clock { display: inline-flex !important; align-items: center !important; flex-wrap: nowrap !important; gap: 4px; white-space: nowrap; vertical-align: middle; }
+    .race-clock input.vTimeField { display: inline-block !important; width: 82px !important; height: 28px !important; min-height: 28px; box-sizing: border-box; margin: 0 !important; padding: 2px 5px; flex: 0 0 auto; transform: translateY(6px); }
+    .race-clock .datetimeshortcuts { display: inline-flex !important; align-items: center !important; flex-wrap: nowrap !important; margin: 0 !important; padding: 0; white-space: nowrap; flex: 0 0 auto; transform: translateY(6px); }
+    .race-clock .datetimeshortcuts a { display: inline-flex; align-items: center; }
+
+    .race-single-form { display: flex !important; align-items: center !important; justify-content: center; flex-wrap: nowrap !important; gap: 8px; margin: 0; white-space: nowrap; }
+    .race-single-form .btn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; margin: 0; line-height: 1; flex: 0 0 auto; }
+
+    #bulk-laps-form { display: flex !important; align-items: center !important; flex-wrap: nowrap !important; gap: 8px; }
+    #bulk-laps-form > .btn { display: inline-flex; align-items: center; justify-content: center; height: 32px; margin: 0; white-space: nowrap; flex: 0 0 auto; }
+</style>
+
+<div class="xd pt-2">
+    {{ mainTime.media }}
+    <form id="bulk-laps-form" method="post" class="mx-auto mb-2 d-flex flex-wrap align-items-center gap-2" style="width:95%">
+        {% csrf_token %}
+        <span class="race-time-line">
+            <label class="race-fold" title="Druga godzina 02:00–02:59, po cofnięciu zegara">
+                {{ mainTime.after_change }}
+                <span>II</span>
+                <span class="visually-hidden">– druga godzina po zmianie czasu</span>
+            </label>
+            <span class="race-clock">{{ mainTime.time_input }}</span>
+        </span>
+        <button type="submit" name="checkBoxSubmit" id="checkBoxSubmit" class="btn btn-danger text-center" title="Rozpocznij lub zakończ zaznaczone okrążenia">
+            <i class="fa-solid fa-person-running"></i> Rozpocznij/Zakończ biegi
+        </button>
+    </form>
+    <div class="TableContainer">
+        <table class="table table-bordered table-striped table-hover table-responsive" id="example" style="text-align:center">
+            <thead class="table-success">
+                <tr>
+                    <th style="width:5%;color:transparent"></th>
+                    <th style="width:5%">ID</th>
+                    <th style="width:10%">Imię</th>
+                    <th style="width:15%">Nazwisko</th>
+                    <th style="width:10%">Liczba okrążeń</th>
+                    <th style="width:15%">Aktualny stan</th>
+                    <th style="width:15%">Czas rozpoczęcia okrążenia</th>
+                    <th style="width:25%">Rozpocznij/Zakończ bieg</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lastRun in lastRunsData %}
+                <tr>
+                    <td><input type="checkbox" name="selected_items" value="{{ lastRun.0 }}" form="bulk-laps-form"></td>
+                    <td>{{ lastRun.0 }}</td>
+                    <td>{{ lastRun.1 }}</td>
+                    <td>{{ lastRun.2 }}</td>
+                    <td>{{ lastRun.3 }}</td>
+                    {% if lastRun.5 == 'ODPOCZYWA' %}
+                        <td style="color:blue">{{ lastRun.5 }}</td>
+                    {% elif lastRun.5 == 'BIEGNIE' %}
+                        <td style="color:red">{{ lastRun.5 }}</td>
+                    {% else %}
+                        <td>{{ lastRun.5 }}</td>
+                    {% endif %}
+                    <td>{{ lastRun.4 }}</td>
+                    <td>
+                        {% if lastRun.5 == 'ODPOCZYWA' or lastRun.5 == 'BIEGNIE' %}
+                            <form method="post" class="race-single-form">
+                                {% csrf_token %}
+                                {% if lastRun.5 == 'ODPOCZYWA' %}
+                                    <span class="race-time-line">
+                                        <label class="race-fold" title="Druga godzina 02:00–02:59, po cofnięciu zegara">
+                                            {{ lastRun.6.start_after_change }}
+                                            <span>II</span>
+                                            <span class="visually-hidden">– druga godzina po zmianie czasu</span>
+                                        </label>
+                                        <span class="race-clock">{{ lastRun.6.start_time_input }}</span>
+                                    </span>
+
+                                    <button type="submit" name="singleInputSubmit" value="{{ lastRun.0 }}" class="btn btn-primary text-center rounded-circle" title="Rozpocznij okrążenie">
+                                        <i class="fa-solid fa-play"></i>
+                                    </button>
+
+                                {% else %}
+                                    <span class="race-time-line">
+                                        <label class="race-fold" title="Druga godzina 02:00–02:59, po cofnięciu zegara">
+                                            {{ lastRun.6.end_after_change }}
+                                            <span>II</span>
+                                            <span class="visually-hidden">– druga godzina po zmianie czasu</span>
+                                        </label>
+                                        <span class="race-clock">{{ lastRun.6.end_time_input }}</span>
+                                    </span>
+
+                                    <button type="submit" name="singleInputSubmit" value="{{ lastRun.0 }}" class="btn btn-danger text-center" title="Zakończ okrążenie">
+                                        <i class="fa-solid fa-stop"></i>
+                                    </button>
+                                {% endif %}
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+</div>
 {% endblock %}

@@ -6,6 +6,7 @@ from datetime import datetime, time, timedelta
 import pytz
 from .forms import *
 from django.utils import timezone
+from .race_time import local_clock_label, utc_elapsed
 
 from django.contrib.auth.models import auth
 from django.contrib import messages
@@ -45,8 +46,9 @@ def runnerResults(request, runnerId):
         rank = get_actual_ranking(run)
         startDate = timezone.localtime(run.startLapDate)
         endDate = timezone.localtime(run.endLapDate)
-        timeDelta = endDate - startDate
-        results.append([run.numberOfLaps, startDate.strftime('%H:%M'), endDate.strftime('%H:%M'), timeDelta, rank])
+        timeDelta = utc_elapsed(run.startLapDate, run.endLapDate)
+        results.append([run.numberOfLaps, local_clock_label(run.startLapDate),
+                        local_clock_label(run.endLapDate), timeDelta, rank])
     return render(request, 'table/runnerResults.html', {'runner': runner, 'runs': results, "table_script": 'tableRunnerResults'})
 
 
@@ -58,28 +60,33 @@ def customAdmin(request):
     mainTime = MyTimeForm(prefix='mainTimeForm')
     if request.method == 'POST':
         if 'singleInputSubmit' in request.POST:
-            # print("Single input work")
-            for formInList in [sublist[6] for sublist in lastRunsData]:
-                if f"{formInList.prefix}-start_time_input" in request.POST and f"{formInList.prefix}-end_time_input" in request.POST:
-                    form = TimeForm(request.POST, prefix=formInList.prefix)
-                    if form.is_valid():
-                        startTime = form.cleaned_data['start_time_input']
-                        endTime = form.cleaned_data['end_time_input']
-                        errorInformation = try_save_runningLap(form.prefix, startTime, endTime)
-                        if errorInformation is not None:
-                            print(errorInformation)
-                            messages.success(request, errorInformation)
-                    else:
-                        print("NOT VALID")
-        elif 'checkBoxSubmit' in request.POST and 'mainTimeForm-time_input' in request.POST:
-            # print("Checkbox work")
-            selected_items = request.POST.getlist('selected_items')
-            mainTimeData = request.POST.get('mainTimeForm-time_input')
-            errorInformation = save_multiple_runningLaps(selected_items, mainTimeData)
-            if errorInformation:
-                print(errorInformation)
-                for error in errorInformation:
-                    messages.success(request, error)
+            runner_id = request.POST['singleInputSubmit']
+            form = TimeForm(request.POST, prefix=str(runner_id))
+            if form.is_valid():
+                error = try_save_runningLap(
+                    runner_id,
+                    form.cleaned_data['start_time_input'],
+                    form.cleaned_data['end_time_input'],
+                    start_second_hour=form.cleaned_data['start_after_change'],
+                    end_second_hour=form.cleaned_data['end_after_change'],
+                )
+                if error:
+                    messages.error(request, error)
+            else:
+                messages.error(request, 'Niepoprawna godzina okrążenia.')
+        elif 'checkBoxSubmit' in request.POST:
+            form = MyTimeForm(request.POST, prefix='mainTimeForm')
+            if form.is_valid() and form.cleaned_data['time_input'] is not None:
+                selected_items = request.POST.getlist('selected_items')
+                clock = form.cleaned_data['time_input'].strftime('%H:%M:%S')
+                errors = save_multiple_runningLaps(
+                    selected_items, clock, second_hour=form.cleaned_data['after_change']
+                )
+                for error in errors if isinstance(errors, list) else [errors]:
+                    if error:
+                        messages.error(request, error)
+            else:
+                messages.error(request, 'Niepoprawna godzina okrążenia.')
         return redirect('customAdmin')
     return render(request, 'admin/customAdmin.html', {"lastRunsData": lastRunsData, "table_script": 'tableAdmin', 'mainTime': mainTime})
 
@@ -102,7 +109,7 @@ colors = ['rgb(255,51,51)', 'rgb(255,128,0)', 'rgb(255,255,0)', 'rgb(221,160,221
 
 
 def line_chart(request):
-    time_strings = [dt.strftime('%H:%M') for dt in list(get_laps_for_every_time())]
+    time_strings = [local_clock_label(dt) for dt in get_laps_for_every_time()]
 
     runners = []
     for runner in Runner.objects.all():
@@ -119,7 +126,6 @@ def line_chart(request):
         'runsData': runsData,
     }
     return render(request, 'chart/line.html', context)
-
 
 def heatmap_chart(request):
     from .heatmap import get_heatmap_context

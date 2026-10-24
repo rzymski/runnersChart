@@ -31,7 +31,7 @@
     <div class="hm-legend mb-3" aria-label="Legenda kolorów">
         {% for value, color, label in heatmap_colors %}
         <span class="hm-legend-item"><span class="hm-swatch" style="background: {{ color }}"></span>
-            {% if value == 0 %}Przerwa{% elif value == 10 %}10 i więcej{% else %}{{ label }}{% endif %}
+            {% if value == 0 %}Przerwa{% else %}{{ label }}{% endif %}
         </span>
         {% endfor %}
     </div>

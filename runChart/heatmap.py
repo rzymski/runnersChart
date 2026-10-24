@@ -5,6 +5,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from .models import Runner, RunningLap
+from .race_time import local_clock_label
 
 
 LAP_COLORS = (
@@ -36,8 +37,8 @@ def _new_segment(start, end, lap_number, timeline_start, timeline_seconds, kind)
         'lap_number': lap_number,
         'band': min(lap_number, 10),
         'kind': kind,  # 'lap', 'break', 'open'
-        'start_label': _local(start).strftime('%d.%m %H:%M'),
-        'end_label': _local(end).strftime('%d.%m %H:%M'),
+        'start_label': local_clock_label(start, with_day=True),
+        'end_label': local_clock_label(end, with_day=True),
     }
 
 
@@ -142,18 +143,18 @@ def get_heatmap_context():
         row['id'],
     ))
 
-    ticks = [{'label': _local(start).strftime('%H:%M'), 'left': 0, 'edge': 'start'}]
+    ticks = [{'label': local_clock_label(start), 'left': 0, 'edge': 'start'}]
     cursor = start.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
     while cursor < end:
         local_cursor = _local(cursor)
         ticks.append({
-            'label': local_cursor.strftime('%H:%M'),
+            'label': local_clock_label(cursor),
             'left': round(100 * (cursor - start).total_seconds() / span_seconds, 6),
             'edge': 'middle',
             'new_day': local_cursor.strftime('%d.%m') if local_cursor.hour == 0 else '',
         })
         cursor += timedelta(hours=1)
-    # Podczas zmiany czasu 02:00 występuje dwukrotnie; zachowujemy oba punkty osi.
+    # Dwa momenty 02:00 są opisane jako (I) i (II), bez CET/CEST.
 
     return {
         'heatmap_rows': rows,
