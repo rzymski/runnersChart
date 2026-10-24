@@ -1,25 +1,35 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <i class="fa-solid fa-person-running" style="color: #fff;"></i>
-        <a class="navbar-brand" href="">Ultra Doba</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <a class="navbar-brand d-inline-flex align-items-center gap-2" href="{% url 'index' %}">
+            <i class="fa-solid fa-person-running" aria-hidden="true"></i> Ultra Doba
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Rozwiń menu">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'heatmap_chart' %}active{% endif %}"
-                       href="{% url 'heatmap_chart' %}">Aktywność zawodników</a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}">Strona główna</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'line_chart' or request.resolver_match.url_name == 'index' %}active{% endif %}"
-                       href="{% url 'line_chart' %}">Porównanie wyników</a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'heatmap_chart' %}active{% endif %}" href="{% url 'heatmap_chart' %}">Aktywność zawodników</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'resultTable' %}active{% endif %}"
-                       href="{% url 'resultTable' %}">Tabela wyników</a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'line_chart' %}active{% endif %}" href="{% url 'line_chart' %}">Porównanie wyników</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'resultTable' %}active{% endif %}" href="{% url 'resultTable' %}">Tabela wyników</a>
+                </li>
+                {% if request.user.is_authenticated and request.user.is_active and request.user.is_staff %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'customAdmin' %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Administracja</a>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item" href="{% url 'customAdmin' %}">Panel obsługi biegu</a></li>
+                        <li><a class="dropdown-item" href="{% url 'admin:index' %}">Django Admin</a></li>
+                    </ul>
+                </li>
+                {% endif %}
             </ul>
         </div>
         {% if request.resolver_match.url_name == 'resultTable' %}

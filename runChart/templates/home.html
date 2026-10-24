@@ -1,0 +1,52 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'userPages/home.css' %}">
+
+<section class="home-page" aria-labelledby="home-title">
+    <div class="home-content">
+        <header class="home-heading">
+            <span class="home-eyebrow"><i class="fa-solid fa-person-running" aria-hidden="true"></i> 5. edycja · Bieg charytatywny</span>
+            <h1 id="home-title">Lipowa <span>Ultra Doba</span></h1>
+            <p>24–25 października 2026 <span class="home-dot" aria-hidden="true">·</span> Lipowy Most</p>
+        </header>
+
+        <figure class="home-hero">
+            <img src="{% static 'userPages/img/lipowy_most_hero.jpg' %}"
+                 alt="Dworek Lipowy Most otoczony drzewami – miejsce biegu Lipowa Ultra Doba"
+                 width="1450" height="902" fetchpriority="high">
+            <figcaption>
+                <span class="home-hero-tag">Biegamy w dobrym celu</span>
+                <span>Wspieramy powstanie ośrodka dziennego pobytu dla dorosłych osób z autyzmem w Supraślu.</span>
+            </figcaption>
+        </figure>
+
+        <nav class="home-actions" aria-label="Wyniki i wykresy biegu">
+            <a class="home-action" href="{% url 'heatmap_chart' %}">
+                <span class="home-action-icon"><i class="fa-solid fa-bars-progress" aria-hidden="true"></i></span>
+                <span class="home-action-text"><strong>Aktywność zawodników</strong><small>Kiedy biegli i odpoczywali</small></span>
+                <i class="fa-solid fa-arrow-right home-action-arrow" aria-hidden="true"></i>
+            </a>
+            <a class="home-action" href="{% url 'line_chart' %}">
+                <span class="home-action-icon"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></span>
+                <span class="home-action-text"><strong>Porównanie wyników</strong><small>Okrążenia na wykresie</small></span>
+                <i class="fa-solid fa-arrow-right home-action-arrow" aria-hidden="true"></i>
+            </a>
+            <a class="home-action" href="{% url 'resultTable' %}">
+                <span class="home-action-icon"><i class="fa-solid fa-list-ol" aria-hidden="true"></i></span>
+                <span class="home-action-text"><strong>Tabela wyników</strong><small>Klasyfikacja i czasy</small></span>
+                <i class="fa-solid fa-arrow-right home-action-arrow" aria-hidden="true"></i>
+            </a>
+        </nav>
+
+        {% if request.user.is_authenticated and request.user.is_active and request.user.is_staff %}
+        <nav class="home-admin" aria-label="Panele administracyjne">
+            <span class="home-admin-label"><i class="fa-solid fa-lock" aria-hidden="true"></i> Administracja</span>
+            <a href="{% url 'customAdmin' %}">Panel obsługi biegu <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+            <a href="{% url 'admin:index' %}">Django Admin <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+        </nav>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
