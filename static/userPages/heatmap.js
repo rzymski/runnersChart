@@ -19,7 +19,15 @@
                 return collator.compare(a.dataset.sortName, b.dataset.sortName) || Number(a.dataset.id) - Number(b.dataset.id);
             }
             if (sort.value === 'id') return Number(a.dataset.id) - Number(b.dataset.id);
-            return Number(b.dataset.laps) - Number(a.dataset.laps) || Number(a.dataset.id) - Number(b.dataset.id);
+            const lapDifference = Number(b.dataset.laps) - Number(a.dataset.laps);
+            if (lapDifference !== 0) return lapDifference;
+
+            // Przy tej samej liczbie okrążeń wygrywa wcześniejsza meta.
+            // Bez ukończonego okrążenia: kolejność według numeru startowego.
+            const finishA = a.dataset.lastFinish ? Number(a.dataset.lastFinish) : Infinity;
+            const finishB = b.dataset.lastFinish ? Number(b.dataset.lastFinish) : Infinity;
+            if (finishA !== finishB) return finishA - finishB;
+            return Number(a.dataset.id) - Number(b.dataset.id);
         });
 
         let visible = 0;
@@ -48,14 +56,13 @@
 
     rowsContainer.addEventListener('pointermove', event => {
         const segment = event.target.closest('.hm-segment');
-        if (!segment) {
+        if (!segment || segment.dataset.kind === 'break') {
             tooltip.hidden = true;
             return;
         }
         const lap = Number(segment.dataset.lap);
         const kind = segment.dataset.kind;
-        const description = kind === 'break' ? 'Przerwa'
-            : kind === 'open' ? `Okrążenie ${lap} – rozpoczęte, bez zarejestrowanego końca`
+        const description = kind === 'open' ? `Okrążenie ${lap} – rozpoczęte, bez zarejestrowanego końca`
             : `Okrążenie ${lap}`;
         tooltip.textContent = `${segment.dataset.name}\n${description}\nOd: ${segment.dataset.start}\nDo: ${segment.dataset.end}${kind === 'open' ? ' (stan na teraz)' : ''}`;
         tooltip.hidden = false;

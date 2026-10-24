@@ -54,7 +54,7 @@
         </div>
         <div id="hm-rows" class="hm-rows">
             {% for runner in heatmap_rows %}
-                <div class="hm-row hm-grid" data-id="{{ runner.id }}" data-name="{{ runner.name|lower }}" data-sort-name="{{ runner.sort_name|lower }}" data-laps="{{ runner.laps }}">
+                <div class="hm-row hm-grid" data-id="{{ runner.id }}" data-name="{{ runner.name|lower }}" data-sort-name="{{ runner.sort_name|lower }}" data-laps="{{ runner.laps }}" data-last-finish="{{ runner.last_finish_ts|default_if_none:'' }}">
                     <div class="hm-runner">
                         <a href="{% url 'runnerResults' runner.id %}" title="Zobacz okrążenia zawodnika {{ runner.name }}">
                             <span class="hm-number">{{ runner.id }}</span> {{ runner.name }}

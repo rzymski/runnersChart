@@ -92,10 +92,14 @@ def get_heatmap_context():
         segments = []
         cursor = start
         completed_laps = 0
+        last_completed_at = None
         for lap_start, lap_finish, lap_number in runs_by_runner[runner['id']]:
-            # Tylko ZAKOŃCZONE okrążenia wpływają na kolumnę „Okr.”.
             if lap_finish is not None and start <= lap_finish <= end:
-                completed_laps = max(completed_laps, lap_number)
+                if (lap_number > completed_laps or
+                        (lap_number == completed_laps and
+                         (last_completed_at is None or lap_finish < last_completed_at))):
+                    completed_laps = lap_number
+                    last_completed_at = lap_finish
 
             if lap_finish is None:
                 if not is_live:
@@ -127,11 +131,16 @@ def get_heatmap_context():
             'name': f"{runner['name']} {runner['surname']}",
             'sort_name': f"{runner['surname']} {runner['name']}",
             'laps': completed_laps,
+            'last_finish_ts': int(last_completed_at.timestamp()) if last_completed_at else None,
             'finished': runner['finished'],
             'segments': segments,
         })
 
-    rows.sort(key=lambda row: (-row['laps'], row['id']))
+    rows.sort(key=lambda row: (
+        -row['laps'],
+        row['last_finish_ts'] if row['last_finish_ts'] is not None else float('inf'),
+        row['id'],
+    ))
 
     ticks = [{'label': _local(start).strftime('%H:%M'), 'left': 0, 'edge': 'start'}]
     cursor = start.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
