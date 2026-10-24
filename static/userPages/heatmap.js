@@ -52,8 +52,12 @@
             tooltip.hidden = true;
             return;
         }
-        const laps = Number(segment.dataset.laps);
-        tooltip.textContent = `${segment.dataset.name}\nUkończone okrążenia: ${laps}\nOd: ${segment.dataset.start}\nDo: ${segment.dataset.end}`;
+        const lap = Number(segment.dataset.lap);
+        const kind = segment.dataset.kind;
+        const description = kind === 'break' ? 'Przerwa / brak aktywnego okrążenia'
+            : kind === 'open' ? `Okrążenie ${lap} – rozpoczęte, bez zarejestrowanego końca`
+            : `Okrążenie ${lap}`;
+        tooltip.textContent = `${segment.dataset.name}\n${description}\nOd: ${segment.dataset.start}\nDo: ${segment.dataset.end}${kind === 'open' ? ' (stan na teraz)' : ''}`;
         tooltip.hidden = false;
         positionTooltip(event);
     });

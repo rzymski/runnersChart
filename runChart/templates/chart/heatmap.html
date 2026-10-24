@@ -7,7 +7,7 @@
     <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
         <div>
             <h1 class="h4 mb-1">Mapa kolorów – postępy biegaczy</h1>
-            <p class="text-secondary mb-0">Jeden wiersz to jeden zawodnik. Kolor pokazuje liczbę <strong>ukończonych</strong> okrążeń w danej chwili.</p>
+            <p class="text-secondary mb-0">Jeden wiersz to jeden zawodnik. Kolor pokazuje <strong>numer pokonywanego okrążenia</strong>. Szare odcinki oznaczają przerwy między okrążeniami.</p>
         </div>
         <div class="hm-overview text-secondary small">
             <span><strong>{{ heatmap_runner_count }}</strong> zawodników</span>
@@ -44,7 +44,7 @@
     <div class="hm-legend mb-3" aria-label="Legenda kolorów">
         {% for value, color, label in heatmap_colors %}
         <span class="hm-legend-item"><span class="hm-swatch" style="background: {{ color }}"></span>
-            {% if value == 0 %}Przed 1. okrążeniem{% elif value == 10 %}10 i więcej{% else %}{{ label }}{% endif %}
+            {% if value == 0 %}Przerwa / brak okrążenia{% elif value == 10 %}10 i więcej{% else %}{{ label }}{% endif %}
         </span>
         {% endfor %}
     </div>
@@ -75,10 +75,10 @@
                     <div class="hm-count">{{ runner.laps }}</div>
                     <div class="hm-track" aria-label="{{ runner.name }} – {{ runner.laps }} ukończonych okrążeń">
                         {% for segment in runner.segments %}
-                            <div class="hm-segment hm-band-{{ segment.band }}"
+                            <div class="hm-segment hm-band-{{ segment.band }}{% if segment.kind == 'open' %} hm-segment-open{% endif %}"
                                  style="left: {{ segment.left|stringformat:'.6f' }}%; width: {{ segment.width|stringformat:'.6f' }}%;"
                                  data-name="{{ runner.name }}"
-                                 data-laps="{{ segment.laps }}"
+                                 data-lap="{{ segment.lap_number }}" data-kind="{{ segment.kind }}"
                                  data-start="{{ segment.start_label }}"
                                  data-end="{{ segment.end_label }}">
                             </div>
@@ -93,7 +93,7 @@
             {% endfor %}
         </div>
     </div>
-    <p class="small text-secondary mt-2 mb-0">Przesuwaj kursorem po kolorowych polach, aby zobaczyć dokładny wynik i przedział czasu. Kliknij zawodnika, aby otworzyć jego szczegółowe wyniki. Przewijaj wykres w pionie i poziomie.</p>
+    <p class="small text-secondary mt-2 mb-0">Przesuwaj kursorem po odcinkach, aby zobaczyć numer okrążenia lub przerwę i dokładne godziny. Okrążenia bez zarejestrowanego końca zaznaczane są podczas trwania biegu przerywaną ramką. Kliknij zawodnika, aby otworzyć jego szczegółowe wyniki. Przewijaj wykres w pionie i poziomie.</p>
 </div>
 <div id="hm-tooltip" class="hm-tooltip" role="tooltip" hidden></div>
 <script defer src="{% static 'userPages/heatmap.js' %}"></script>

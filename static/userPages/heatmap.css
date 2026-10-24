@@ -39,12 +39,12 @@
 .hm-band-2 { background-color: #f97316; }
 .hm-band-3 { background-color: #facc15; }
 .hm-band-4 { background-color: #84cc16; }
-.hm-band-5 { background-color: #22c55e; }
-.hm-band-6 { background-color: #14b8a6; }
-.hm-band-7 { background-color: #0ea5e9; }
-.hm-band-8 { background-color: #6366f1; }
-.hm-band-9 { background-color: #a855f7; }
-.hm-band-10 { background-color: #be185d; }
+.hm-band-5 { background-color: #0ea5e9; }
+.hm-band-6 { background-color: #6366f1; }
+.hm-band-7 { background-color: #a855f7; }
+.hm-band-8 { background-color: #ab47bc; }
+.hm-band-9 { background-color: #311b92; }
+.hm-band-10 { background-color: #212121; }
 .hm-tooltip { position: fixed; z-index: 50; pointer-events: none; padding: 9px 12px; border-radius: 5px; box-shadow: 0 4px 18px rgba(0,0,0,.23); color: #fff; background: #1f2937; font-size: 12px; line-height: 1.5; white-space: pre-line; max-width: 300px; }
 @media (max-width: 680px) {
     .hm-page { --hm-name-width: 185px; --hm-count-width: 48px; }
@@ -54,3 +54,6 @@
 }
 
 .hm-row[hidden] { display: none !important; }
+
+/* Otwarte okrążenie: godzina rozpoczęcia jest znana, zakończenia jeszcze nie ma. */
+.hm-segment-open { outline: 2px dashed rgba(0,0,0,.55); outline-offset: -2px; }
