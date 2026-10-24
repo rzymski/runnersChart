@@ -25,11 +25,7 @@
 <body class="wrapper">
     <div class="myNavAndContent">
         <header>
-            {% if request.path == '/chart/line/' or request.path == '/' %}
-                {% include 'partials/nav_with_button.html' %}
-            {% else %}
-                {% include 'partials/nav.html' %}
-            {% endif %}
+            {% include 'partials/nav.html' %}
         </header>
         <main>
             {% if messages %}

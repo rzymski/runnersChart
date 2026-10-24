@@ -153,7 +153,6 @@ def get_heatmap_context():
             'new_day': local_cursor.strftime('%d.%m') if local_cursor.hour == 0 else '',
         })
         cursor += timedelta(hours=1)
-    ticks.append({'label': _local(end).strftime('%H:%M'), 'left': 100, 'edge': 'end'})
     # Podczas zmiany czasu 02:00 występuje dwukrotnie; zachowujemy oba punkty osi.
 
     return {

@@ -2,30 +2,30 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
         <i class="fa-solid fa-person-running" style="color: #fff;"></i>
-        <a class="navbar-brand" href="">Bieg nocny</a>
+        <a class="navbar-brand" href="">Ultra Doba</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'heatmap_chart' %}">Wykres biegów</a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'heatmap_chart' %}active{% endif %}"
+                       href="{% url 'heatmap_chart' %}">Aktywność zawodników</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'line_chart' %}">Wykres biegów V2</a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'line_chart' or request.resolver_match.url_name == 'index' %}active{% endif %}"
+                       href="{% url 'line_chart' %}">Porównanie wyników</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'resultTable' %}">Tabela wyników</a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'resultTable' %}active{% endif %}"
+                       href="{% url 'resultTable' %}">Tabela wyników</a>
                 </li>
-          </ul>
+            </ul>
         </div>
-        <div class="d-flex" style="margin-right: 25px">
-            <div class="input-group input-group-sm">
-                <input class="form-control" type="search" id="search" placeholder="Wyszukiwarka wszystkiego" aria-label="Search">
-                <a href="{% url 'resultTable' %}" class="btn btn-secondary btn-sm">
-                    <i class="fas fa-sync-alt"></i>
-                </a>
-            </div>
-        </div>
+        {% if request.resolver_match.url_name == 'resultTable' %}
+            {% include 'partials/nav_search.html' %}
+        {% elif request.resolver_match.url_name == 'line_chart' %}
+            {% include 'partials/nav_line_button.html' %}
+        {% endif %}
     </div>
 </nav>
