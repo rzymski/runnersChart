@@ -9,6 +9,8 @@ body.wrapper { grid-template-rows: minmax(0, 1fr) auto; }
 .hm-toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
 .hm-toolbar > div:first-child { width: min(300px, 100%); }
 .hm-toolbar > div:nth-child(2) { width: min(260px, 100%); }
+.hm-toolbar .hm-overview { margin-left: auto; align-self: center; justify-content: flex-end; width: auto; }
+@media (max-width: 900px) {  .hm-toolbar .hm-overview { margin-left: 0; justify-content: flex-start; }  }
 .hm-toolbar-info { padding-bottom: 5px; }
 .hm-legend { display: flex; gap: 8px 13px; flex-wrap: wrap; font-size: 12px; }
 .hm-legend-item { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }

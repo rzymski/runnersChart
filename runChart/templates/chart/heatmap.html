@@ -4,15 +4,7 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'userPages/heatmap.css' %}">
 <div class="hm-page container-fluid py-3" style="--hm-axis-width: {{ heatmap_axis_min_width }}px">
-    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
-        <div class="hm-overview text-secondary small">
-            <span><strong>{{ heatmap_runner_count }}</strong> zawodników</span>
-            <span><strong>{{ heatmap_laps_count }}</strong> ukończonych okrążeń</span>
-            <span>{{ heatmap_start|date:"d.m.Y H:i" }} – {{ heatmap_end|date:"d.m.Y H:i" }}</span>
-        </div>
-    </div>
-
-    <div class="hm-toolbar mb-3" aria-label="Narzędzia mapy kolorów">
+    <div class="hm-toolbar mb-3" aria-label="Narzędzia wykresu aktywności zawodników">
         <div>
             <label class="form-label small mb-1" for="hm-search">Znajdź zawodnika</label>
             <input id="hm-search" class="form-control form-control-sm" type="search" placeholder="Numer, imię lub nazwisko" autocomplete="off">
@@ -26,6 +18,12 @@
             </select>
         </div>
         <div class="hm-toolbar-info small text-secondary" id="hm-visible-count" aria-live="polite"></div>
+
+        <div class="hm-overview text-secondary small">
+            <span><strong>{{ heatmap_runner_count }}</strong> zawodników</span>
+            <span><strong>{{ heatmap_laps_count }}</strong> ukończonych okrążeń</span>
+            <span>{{ heatmap_start|date:"d.m.Y H:i" }} – {{ heatmap_end|date:"d.m.Y H:i" }}</span>
+        </div>
     </div>
 
     <div class="hm-legend mb-3" aria-label="Legenda kolorów">
@@ -36,7 +34,7 @@
         {% endfor %}
     </div>
 
-    <div class="hm-scroll" tabindex="0" role="region" aria-label="Mapa kolorów biegaczy – przewijana pionowo i poziomo">
+    <div class="hm-scroll" tabindex="0" role="region" aria-label="Aktywność zawodników – wykres przewijany pionowo i poziomo">
         <div class="hm-header hm-grid">
             <div class="hm-runner-header">Zawodnik</div>
             <div class="hm-count-header" title="Liczba ukończonych okrążeń">Okrążenia</div>
