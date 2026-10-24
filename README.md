@@ -62,6 +62,10 @@ SECOND_DAY = FIRST_DAY + timedelta(days=1)
 <img src="readmeImages/settings.png?raw=true" alt="Wybranie daty biegu w ustawieniach kodu">
 </details>
 
+> [!Important]
+> ### W **`settings.py`** do **`ALLOWED_HOSTS`** dodać adres url, gdzie będzie wystawiona aplikacja:
+> np. 'nocnybieg2023.pythonanywhere.com', 'ultradoba2024.pythonanywhere.com', 'ultradoba2025.pythonanywhere.com'.
+
 <h3>Przydatne polecenia:</h3>
 
 Tworzenie migracji po zmianie modelów
@@ -151,6 +155,11 @@ python manage.py collectstatic
 W przypadku wyłączenia się konsoli i zamknięcia wirtualnego środowiska, żeby włączyć z powrotem wirtualne środowisko w `/home/ultradoba2024/.virtualenvs`:
 ```sh
 workon venv
+```
+
+Może wystąpić potrzeba zmigrowania, dla poprawnego działania aplikacji:
+```sh
+python manage.py migrate
 ```
 
 # Działanie aplikacji na serwerze
