@@ -42,22 +42,26 @@
     <div class="hm-scroll" tabindex="0" role="region" aria-label="Mapa kolorów biegaczy – przewijana pionowo i poziomo">
         <div class="hm-header hm-grid">
             <div class="hm-runner-header">Zawodnik</div>
-            <div class="hm-count-header" title="Liczba ukończonych okrążeń">Okr.</div>
+            <div class="hm-count-header" title="Liczba ukończonych okrążeń">Okrążenia</div>
             <div class="hm-axis" aria-label="Godziny biegu">
                 {% for tick in heatmap_ticks %}
                     <span class="hm-axis-tick hm-axis-{{ tick.edge }}" style="left: {{ tick.left|stringformat:'.6f' }}%">
                         <span>{{ tick.label }}</span>
-                        {% if tick.new_day %}<small>{{ tick.new_day }}</small>{% endif %}
                     </span>
                 {% endfor %}
             </div>
         </div>
         <div id="hm-rows" class="hm-rows">
             {% for runner in heatmap_rows %}
-                <div class="hm-row hm-grid" data-id="{{ runner.id }}" data-name="{{ runner.name|lower }}" data-sort-name="{{ runner.sort_name|lower }}" data-laps="{{ runner.laps }}" data-last-finish="{{ runner.last_finish_ts|default_if_none:'' }}">
+                <div class="hm-row hm-grid"
+                     data-id="{{ runner.id }}"
+                     data-name="{{ runner.name|lower }}"
+                     data-sort-name="{{ runner.sort_name|lower }}"
+                     data-laps="{{ runner.laps }}"
+                     data-last-finish="{{ runner.last_finish_ts|default_if_none:'' }}">
                     <div class="hm-runner">
                         <a href="{% url 'runnerResults' runner.id %}" title="Zobacz okrążenia zawodnika {{ runner.name }}">
-                            <span class="hm-number">{{ runner.id }}</span> {{ runner.name }}
+                            <span class="hm-number">{{ runner.id }}</span><span class="hm-full-name">{{ runner.sort_name }}</span>
                         </a>
                         {% if runner.finished %}<span class="hm-finished" title="Zakończył bieg">✓</span>{% endif %}
                     </div>
@@ -67,7 +71,8 @@
                             <div class="hm-segment hm-band-{{ segment.band }}{% if segment.kind == 'open' %} hm-segment-open{% endif %}"
                                  style="left: {{ segment.left|stringformat:'.6f' }}%; width: {{ segment.width|stringformat:'.6f' }}%;"
                                  data-name="{{ runner.name }}"
-                                 data-lap="{{ segment.lap_number }}" data-kind="{{ segment.kind }}"
+                                 data-lap="{{ segment.lap_number }}"
+                                 data-kind="{{ segment.kind }}"
                                  data-start="{{ segment.start_label }}"
                                  data-end="{{ segment.end_label }}">
                             </div>
