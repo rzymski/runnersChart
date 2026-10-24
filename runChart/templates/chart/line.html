@@ -2,44 +2,51 @@
 
 {% block content %}
 <style>
-    body.wrapper {
-        grid-template-rows: minmax(0, 1fr) auto;
-    }
+    body.wrapper { grid-template-rows: minmax(0, 1fr) auto; }
+    .myNavAndContent { display: flex; flex-direction: column; height: auto; min-height: 0; }
+    .myNavAndContent > header { flex: 0 0 auto; }
+    .myNavAndContent > main { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; min-width: 0; }
 
-    .myNavAndContent {
-        display: flex;
-        flex-direction: column;
-        height: auto;
-        min-height: 0;
-    }
+    .line-chart-layout { display: flex; flex: 1 1 auto; min-height: 0; min-width: 0; gap: 12px; padding: 10px 12px 6px; overflow: hidden; }
+    .line-chart-container { position: relative; flex: 1 1 auto; min-height: 0; min-width: 0; }
+    #myLineChart { display: block; }
 
-    .myNavAndContent > header {
-        flex: 0 0 auto;
-    }
+    .line-legend { display: flex; flex: 0 0 340px; flex-direction: column; min-width: 0; min-height: 0; border: 1px solid #d6dce1; border-radius: 6px; background: #fff; overflow: hidden; }
+    .line-legend-header { flex: 0 0 auto; padding: 10px 12px; border-bottom: 1px solid #e2e6ea; background: #f8fafb; }
+    .line-legend-title { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 14px; font-weight: 600; }
+    .line-legend-counter { color: #59636e; font-size: 12px; font-weight: 400; }
+    .line-legend-search { display: block; width: 100%; padding: 6px 9px; border: 1px solid #ced4da; border-radius: 4px; background: #fff; font-size: 13px; }
+    .line-legend-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 4px 0; }
+    .line-legend-item { display: flex; align-items: center; gap: 9px; width: 100%; min-height: 29px; padding: 4px 12px; border: 0; background: transparent; color: #212529; text-align: left; font-size: 12px; cursor: pointer; }
+    .line-legend-item:hover { background: #edf3f8; }
+    .line-legend-item:focus-visible { outline: 2px solid #0d6efd; outline-offset: -2px; }
+    .line-legend-item.is-hidden { opacity: .42; text-decoration: line-through; }
+    .line-legend-item[hidden] { display: none !important; }
+    .line-legend-swatch { display: inline-block; flex: 0 0 26px; height: 4px; border-radius: 2px; }
+    .line-legend-name { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
 
-    .myNavAndContent > main {
-        display: flex;
-        flex: 1 1 auto;
-        flex-direction: column;
-        min-height: 0;
-        min-width: 0;
-    }
-
-    .line-chart-container {
-        position: relative;
-        flex: 1 1 auto;
-        min-height: 0;
-        min-width: 0;
-        margin: 10px 12px 6px;
-    }
-
-    #myLineChart {
-        display: block;
+    @media (max-width: 760px) {
+        .line-chart-layout { flex-direction: column; overflow-y: auto; }
+        .line-chart-container { flex: 0 0 55vh; min-height: 260px; }
+        .line-legend { flex: 0 0 220px; min-height: 180px; width: 100%; }
     }
 </style>
 
-<div class="line-chart-container">
-    <canvas id="myLineChart"></canvas>
+<div class="line-chart-layout">
+    <div class="line-chart-container">
+        <canvas id="myLineChart"></canvas>
+    </div>
+
+    <aside class="line-legend" aria-label="Lista zawodników na wykresie">
+        <div class="line-legend-header">
+            <div class="line-legend-title">
+                <span>Biegacze</span>
+                <span class="line-legend-counter" id="line-legend-counter"></span>
+            </div>
+            <input id="line-legend-search" class="line-legend-search" type="search" placeholder="Szukaj numeru lub nazwiska" aria-label="Wyszukaj zawodnika na wykresie" autocomplete="off">
+        </div>
+        <div class="line-legend-list" id="line-legend-list"></div>
+    </aside>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -47,84 +54,99 @@
     const runners = {{ runners|safe }};
     const labelTimes = {{ labels|safe }};
     const colors = {{ colors|safe }};
-    const datasets = [];
     const runsData = {{ runsData|safe }};
 
-    const flatLine = (ctx, value) => ctx.p0.parsed.y == ctx.p1.parsed.y ? value : undefined;
-
-    for (let i = 0; i < runners.length; i++) {
-        const backgroundColor = [colors[i % 30]];
-        const borderColor = [colors[i % 30]];
-        datasets.push({
-            label: `${runners[i]}`,
+    const flatLine = (ctx, value) => ctx.p0.parsed.y === ctx.p1.parsed.y ? value : undefined;
+    const datasets = runners.map((runner, i) => {
+        const color = colors[i % colors.length];
+        return {
+            label: String(runner),
             data: runsData[i],
-            borderColor: borderColor,
-            backgroundColor: backgroundColor,
-            segment: {
-                borderDash: ctx => flatLine(ctx, [4, 20]),
-                label: ctx => flatLine(ctx, 'Super')
-            }
-        });
-    }
+            borderColor: color,
+            backgroundColor: color,
+            segment: { borderDash: ctx => flatLine(ctx, [4, 20]) }
+        };
+    });
 
     const ctx = document.getElementById('myLineChart').getContext('2d');
     const myLineChart = new Chart(ctx, {
         type: 'line',
-        data: {
-            labels: labelTimes,
-            datasets: datasets
-        },
+        data: { labels: labelTimes, datasets: datasets },
         options: {
-            elements: {
-                point: {
-                    radius: 5
-                }
-            },
             responsive: true,
             maintainAspectRatio: false,
+            elements: { point: { radius: 5 } },
             plugins: {
-                legend: {
-                    title: {
-                        display: true,
-                        text: 'Biegacze'
-                    },
-                    position: 'right'
-                },
-                title: {
-                    display: true,
-                    text: 'Wykres najlepszych biegaczy'
-                }
+                legend: { display: false },
+                title: { display: true, text: 'Wykres najlepszych biegaczy' }
             },
             scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'czas'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Liczba okrążeń'
-                    },
-                    min: 0,
-                    ticks: {
-                        stepSize: 1
-                    },
-                    suggestedMax: 4
-                }
+                x: { title: { display: true, text: 'czas' } },
+                y: { title: { display: true, text: 'Liczba okrążeń' }, min: 0, ticks: { stepSize: 1 }, suggestedMax: 4 }
             }
         }
     });
 
-    let linesVisible = true;
+    const legendList = document.getElementById('line-legend-list');
+    const legendSearch = document.getElementById('line-legend-search');
+    const legendCounter = document.getElementById('line-legend-counter');
+    const legendButtons = [];
+
+    datasets.forEach((dataset, i) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'line-legend-item';
+        button.title = 'Kliknij, aby pokazać lub ukryć linię zawodnika';
+        button.dataset.search = dataset.label.toLocaleLowerCase('pl');
+
+        const swatch = document.createElement('span');
+        swatch.className = 'line-legend-swatch';
+        swatch.style.backgroundColor = dataset.borderColor;
+
+        const name = document.createElement('span');
+        name.className = 'line-legend-name';
+        name.textContent = dataset.label;
+
+        button.append(swatch, name);
+        button.addEventListener('click', () => {
+            myLineChart.setDatasetVisibility(i, !myLineChart.isDatasetVisible(i));
+            myLineChart.update();
+            refreshLegendVisibility();
+        });
+
+        legendList.appendChild(button);
+        legendButtons.push(button);
+    });
+
+    function refreshLegendVisibility() {
+        legendButtons.forEach((button, i) => {
+            const visible = myLineChart.isDatasetVisible(i);
+            button.classList.toggle('is-hidden', !visible);
+            button.setAttribute('aria-pressed', String(visible));
+        });
+    }
+
+    function filterLegend() {
+        const search = legendSearch.value.trim().toLocaleLowerCase('pl');
+        let visibleCount = 0;
+        legendButtons.forEach(button => {
+            const matched = button.dataset.search.includes(search);
+            button.hidden = !matched;
+            if (matched) visibleCount++;
+        });
+        legendCounter.textContent = `${visibleCount} z ${legendButtons.length}`;
+    }
+
+    legendSearch.addEventListener('input', filterLegend);
+    refreshLegendVisibility();
+    filterLegend();
+
+    // Przycisk z nav_line_button.html – działa również po klikaniu pojedynczych nazwisk.
     function showHideLines() {
-        const datasets = myLineChart.data.datasets;
-        for (let i = 0; i < datasets.length; i++) {
-            datasets[i].hidden = linesVisible;
-        }
+        const anyVisible = datasets.some((_, i) => myLineChart.isDatasetVisible(i));
+        datasets.forEach((_, i) => myLineChart.setDatasetVisibility(i, !anyVisible));
         myLineChart.update();
-        linesVisible = !linesVisible;
+        refreshLegendVisibility();
     }
 </script>
 {% endblock %}
