@@ -2,13 +2,14 @@ ___
 **Aplikacja webowa stworzona w Django 4.2.5 i pythonie 3.11.1**
 ___
 
-## Zawartość REDME
+## Zawartość README
 1. :runner: [Cel aplikacji](#cel-aplikacji)
 2. :scroll: [Funkcjonalność](#funkcjonalność)
 3. :computer: [Uruchomienie aplikacji lokalnie](#Instrukcja-uruchomienia-aplikacji-lokalnie)
 4. :wrench: [Konfiguracja](#konfiguracja)
 5. :satellite: [Wdrożenie na serwer pythonanywhere](#wdrożenie-na-serwer-pythonanywhere)
-6. :globe_with_meridians: [Działanie aplikacji na serwerze](#działanie-aplikacji-na-serwerze)
+6. :floppy_disk: [Kopia zapasowa bazy SQLite na PythonAnywhere](#kopia-zapasowa-bazy-sqlite-na-pythonanywhere)
+7. :globe_with_meridians: [Działanie aplikacji na serwerze](#działanie-aplikacji-na-serwerze)
 
 # Cel aplikacji
 Aplikacja została stworzona na potrzeby wydarzenia dwudniowego biegu, zaczynającego się wieczorem i kończącego ranem następnego dnia.<br/>
@@ -16,11 +17,13 @@ Aplikacja umożliwia prezentacje wyników biegaczy w formie wykresu i tabeli.<br
 Zarządzanie danymi biegów aplikacji odbywa się w dostosowanym panelu administracyjnym lub domyślnym panelu administracyjnym.
 
 # Funkcjonalność
-1) [x] Wykres z wynikami biegaczy
-2) [x] Tabela z wynikami biegaczy
-3) [x] Tabela z wynikami pojedyńczego biegacza
-4) [x] Dostosowany panel administracyjny
-5) [x] Strandardowy panel administracyjny Django
+1) [x] Strona główna z nawigacją do wyników
+2) [x] Wykres liniowy z wynikami biegaczy
+3) [x] Wykres aktywności zawodników (heatmapa)
+4) [x] Tabela z wynikami biegaczy
+5) [x] Tabela z wynikami pojedynczego biegacza
+6) [x] Dostosowany panel administracyjny
+7) [x] Standardowy panel administracyjny Django
 
 
 # Instrukcja uruchomienia aplikacji lokalnie:
@@ -157,31 +160,72 @@ W przypadku wyłączenia się konsoli i zamknięcia wirtualnego środowiska, że
 workon venv
 ```
 
-Może wystąpić potrzeba zmigrowania, dla poprawnego działania aplikacji:
+**Przy pierwszym wdrożeniu wykonanie migracji jest konieczne** (tworzą tabele bazy danych). Uruchom w katalogu z `manage.py`:
 ```sh
 python manage.py migrate
 ```
 
+# Kopia zapasowa bazy SQLite na PythonAnywhere
+
+Aplikacja przechowuje zawodników, okrążenia, czasy oraz konta Django w pliku `db.sqlite3`. Szczególnie podczas biegu należy regularnie wykonywać kopie i **pobierać je na swój komputer** — kopia pozostawiona wyłącznie na tym samym serwerze nie zabezpiecza przed utratą konta lub danych serwera.
+
+## Tworzenie kopii na serwerze
+
+1. Na PythonAnywhere otwórz **Consoles → Bash**.
+2. Przejdź do katalogu projektu (tam, gdzie jest `manage.py` i `db.sqlite3`):
+
+   ```bash
+   cd ~/runnersChart
+   ```
+
+3. Utwórz katalog na kopie (wystarczy zrobić to raz):
+
+   ```bash
+   mkdir -p backups
+   ```
+
+4. Wykonaj kopię poleceniem SQLite:
+
+   ```bash
+   sqlite3 db.sqlite3 ".backup 'backups/db-$(date +%Y-%m-%d_%H-%M-%S).sqlite3'"
+   ```
+
+## Pobieranie kopii na własny komputer
+
+1. W panelu PythonAnywhere wejdź w **Files**.
+2. Otwórz katalog projektu `runnersChart`, a następnie `backups`.
+3. Kliknij opcję **Download** przy wybranym pliku `.sqlite3` i zapisz go na komputerze.
+4. Dobrze jest zachować nazwę zawierającą datę i przechowywać kopie w osobnym miejscu niż projekt.
+
 # Działanie aplikacji na serwerze
-**Można sprawdzić działanie aplikacji w:**
- - https://ultradoba2024.pythonanywhere.com/
 
-**Wykres:**
-- https://ultradoba2024.pythonanywhere.com/chart/line
-<img src="readmeImages/chart.png?raw=true" alt="Wykres biegów">
+**Adres aplikacji:** 
+ - https://ultradoba2026.pythonanywhere.com/
 
-**Tabela z wynikami biegaczy:**
-- https://ultradoba2024.pythonanywhere.com/table/result
-<img src="readmeImages/resultsTable.png?raw=true" alt="Tabela wyników biegaczy">
+## Strona główna
+- https://ultradoba2026.pythonanywhere.com/
+![Strona główna Lipowa Ultra Doba](readmeImages/home.png)
 
-**Tabela wyników pojedyńczego biegacza:**
-- https://ultradoba2024.pythonanywhere.com/table/runnerResults/1 *id biegacza*
-<img src="readmeImages/singleRunnerResultsTable.png?raw=true" alt="Tabela wyników pojedyńczego biegacza">
+## Aktywność zawodników — wykres kolorowych okrążeń (heatmapa)
+- https://ultradoba2026.pythonanywhere.com/chart/heatmap/
+![Aktywność zawodników — heatmapa](readmeImages/heatmap.png)
 
-**Spersonalizowany panel administracyjny:**
-- https://ultradoba2024.pythonanywhere.com/admin/customAdmin
-<img src="readmeImages/customAdminPanel.png?raw=true" alt="Spersonalizowany panel administracyjny">
+## Wykres liniowy — porównanie wyników
+- https://ultradoba2026.pythonanywhere.com/chart/line/
+![Wykres liniowy wyników](readmeImages/chart.png)
 
-**Domyślny panel administracyjny:**
-- https://ultradoba2024.pythonanywhere.com/admin
-<img src="readmeImages/adminPanel.png?raw=true" alt="Domyślny panel administracyjny Django">
+## Tabela wyników zawodników
+- https://ultradoba2026.pythonanywhere.com/table/result
+![Tabela wyników zawodników](readmeImages/resultsTable.png)
+
+## Wyniki pojedynczego zawodnika
+- https://ultradoba2026.pythonanywhere.com/table/runnerResults/1
+![Tabela wyników pojedynczego zawodnika](readmeImages/singleRunnerResultsTable.png)
+
+## Spersonalizowany panel administracyjny
+- https://ultradoba2026.pythonanywhere.com/admin/customAdmin
+![Spersonalizowany panel administracyjny](readmeImages/customAdminPanel.png)
+
+## Standardowy panel Django Admin
+- https://ultradoba2026.pythonanywhere.com/admin/
+![Standardowy panel Django Admin](readmeImages/adminPanel.png)
