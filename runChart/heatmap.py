@@ -1,10 +1,3 @@
-"""Dane do mapy okrążeń.
-
-Kolor oznacza NUMER okrążenia w przedziale od startLapDate do endLapDate.
-Odstępy pomiędzy okrążeniami mają kolor 0 (brak aktywnego okrążenia).
-Czas liczymy w UTC, żeby uniknąć błędów przy zmianie czasu w październiku.
-"""
-
 from collections import defaultdict
 from datetime import timedelta, timezone as datetime_timezone
 
@@ -14,8 +7,6 @@ from django.utils import timezone
 from .models import Runner, RunningLap
 
 
-# 0 = przerwa / brak aktywnego okrążenia, 1..9 = numer okrążenia,
-# 10+ = wspólny kolor; w dymku widoczny dokładny numer okrążenia.
 LAP_COLORS = (
     (0, "#e9ecef", "0"),
     (1, "#ef4444", "1"),
@@ -45,8 +36,8 @@ def _new_segment(start, end, lap_number, timeline_start, timeline_seconds, kind)
         'lap_number': lap_number,
         'band': min(lap_number, 10),
         'kind': kind,  # 'lap', 'break', 'open'
-        'start_label': _local(start).strftime('%d.%m %H:%M %Z'),
-        'end_label': _local(end).strftime('%d.%m %H:%M %Z'),
+        'start_label': _local(start).strftime('%d.%m %H:%M'),
+        'end_label': _local(end).strftime('%d.%m %H:%M'),
     }
 
 
@@ -150,17 +141,11 @@ def get_heatmap_context():
             'label': local_cursor.strftime('%H:%M'),
             'left': round(100 * (cursor - start).total_seconds() / span_seconds, 6),
             'edge': 'middle',
-            'tz_name': local_cursor.strftime('%Z'),
             'new_day': local_cursor.strftime('%d.%m') if local_cursor.hour == 0 else '',
         })
         cursor += timedelta(hours=1)
     ticks.append({'label': _local(end).strftime('%H:%M'), 'left': 100, 'edge': 'end'})
-    # Podczas zmiany czasu 02:00 w Polsce występuje dwukrotnie.
-    for index in range(1, len(ticks) - 2):
-        first, second = ticks[index], ticks[index + 1]
-        if first['label'] == second['label'] and first['edge'] == second['edge'] == 'middle':
-            first['tz_label'] = first['tz_name']
-            second['tz_label'] = second['tz_name']
+    # Podczas zmiany czasu 02:00 występuje dwukrotnie; zachowujemy oba punkty osi.
 
     return {
         'heatmap_rows': rows,

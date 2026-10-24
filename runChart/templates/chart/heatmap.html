@@ -7,7 +7,6 @@
     <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
         <div>
             <h1 class="h4 mb-1">Mapa kolorów – postępy biegaczy</h1>
-            <p class="text-secondary mb-0">Jeden wiersz to jeden zawodnik. Kolor pokazuje <strong>numer pokonywanego okrążenia</strong>. Szare odcinki oznaczają przerwy między okrążeniami.</p>
         </div>
         <div class="hm-overview text-secondary small">
             <span><strong>{{ heatmap_runner_count }}</strong> zawodników</span>
@@ -15,15 +14,6 @@
             <span>{{ heatmap_start|date:"d.m.Y H:i" }} – {{ heatmap_end|date:"d.m.Y H:i" }}</span>
         </div>
     </div>
-
-    {% if heatmap_config_warning %}
-    <div class="alert alert-warning" role="alert">
-        Daty zarejestrowanych okrążeń są bardzo odległe od daty startu biegu.
-        Sprawdź ustawienie <code>FIRST_DAY</code> w <code>runProject/settings.py</code>
-        (obecnie {{ heatmap_start|date:"d.m.Y H:i" }}).
-        Ze względów wydajności nie rysuję osi rozciągniętej na wiele dni lub miesięcy.
-    </div>
-    {% endif %}
 
     <div class="hm-toolbar mb-3" aria-label="Narzędzia mapy kolorów">
         <div>
@@ -44,7 +34,7 @@
     <div class="hm-legend mb-3" aria-label="Legenda kolorów">
         {% for value, color, label in heatmap_colors %}
         <span class="hm-legend-item"><span class="hm-swatch" style="background: {{ color }}"></span>
-            {% if value == 0 %}Przerwa / brak okrążenia{% elif value == 10 %}10 i więcej{% else %}{{ label }}{% endif %}
+            {% if value == 0 %}Przerwa{% elif value == 10 %}10 i więcej{% else %}{{ label }}{% endif %}
         </span>
         {% endfor %}
     </div>
@@ -58,7 +48,6 @@
                     <span class="hm-axis-tick hm-axis-{{ tick.edge }}" style="left: {{ tick.left|stringformat:'.6f' }}%">
                         <span>{{ tick.label }}</span>
                         {% if tick.new_day %}<small>{{ tick.new_day }}</small>{% endif %}
-                        {% if tick.tz_label %}<small>{{ tick.tz_label }}</small>{% endif %}
                     </span>
                 {% endfor %}
             </div>
@@ -93,7 +82,6 @@
             {% endfor %}
         </div>
     </div>
-    <p class="small text-secondary mt-2 mb-0">Przesuwaj kursorem po odcinkach, aby zobaczyć numer okrążenia lub przerwę i dokładne godziny. Okrążenia bez zarejestrowanego końca zaznaczane są podczas trwania biegu przerywaną ramką. Kliknij zawodnika, aby otworzyć jego szczegółowe wyniki. Przewijaj wykres w pionie i poziomie.</p>
 </div>
 <div id="hm-tooltip" class="hm-tooltip" role="tooltip" hidden></div>
 <script defer src="{% static 'userPages/heatmap.js' %}"></script>

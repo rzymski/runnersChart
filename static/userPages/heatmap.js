@@ -54,7 +54,7 @@
         }
         const lap = Number(segment.dataset.lap);
         const kind = segment.dataset.kind;
-        const description = kind === 'break' ? 'Przerwa / brak aktywnego okrążenia'
+        const description = kind === 'break' ? 'Przerwa'
             : kind === 'open' ? `Okrążenie ${lap} – rozpoczęte, bez zarejestrowanego końca`
             : `Okrążenie ${lap}`;
         tooltip.textContent = `${segment.dataset.name}\n${description}\nOd: ${segment.dataset.start}\nDo: ${segment.dataset.end}${kind === 'open' ? ' (stan na teraz)' : ''}`;
