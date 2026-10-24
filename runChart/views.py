@@ -120,6 +120,7 @@ def line_chart(request):
     }
     return render(request, 'chart/line.html', context)
 
+
 def heatmap_chart(request):
     from .heatmap import get_heatmap_context
     return render(request, 'chart/heatmap.html', get_heatmap_context())
