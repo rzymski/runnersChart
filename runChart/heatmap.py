@@ -1,11 +1,11 @@
 from collections import defaultdict
-from datetime import timedelta, timezone as datetime_timezone
+from datetime import datetime, time, timedelta, timezone as datetime_timezone
 
 from django.conf import settings
 from django.utils import timezone
 
 from .models import Runner, RunningLap
-from .race_time import local_clock_label
+from .race_time import local_clock_label, race_timezone
 
 
 LAP_COLORS = (
@@ -57,25 +57,10 @@ def get_heatmap_context():
         )
     )
 
-    # 'Otwarte' okrążenie (endLapDate=NULL) rysujemy tylko, gdy bieg rzeczywiście
-    # jest w trakcie. W archiwalnych danych nie znamy daty jego zakończenia.
-    is_live = start <= now <= start + timedelta(hours=48)
-    latest_activity = max(
-        (dt.astimezone(datetime_timezone.utc)
-         for lap in laps
-         for dt in (lap['startLapDate'], lap['endLapDate']) if dt is not None),
-        default=start,
-    )
-    if is_live:
-        latest_activity = max(latest_activity, now)
-
-    # Nie rozciągamy osi na wiele miesięcy wskutek błędnej daty FIRST_DAY.
-    date_mismatch = bool(laps) and (
-        latest_activity < start - timedelta(days=1)
-        or latest_activity > start + timedelta(hours=48)
-    )
-    end = (start + timedelta(hours=12) if date_mismatch else
-           max(start + timedelta(hours=12), latest_activity + timedelta(minutes=30)))
+    race_tz = race_timezone()
+    start_local = start.astimezone(race_tz)
+    end_local = datetime.combine(start_local.date() + timedelta(days=1), time(10, 0), tzinfo=race_tz)
+    end = end_local.astimezone(datetime_timezone.utc)
     span_seconds = (end - start).total_seconds()
 
     runs_by_runner = defaultdict(list)
@@ -103,16 +88,12 @@ def get_heatmap_context():
                     last_completed_at = lap_finish
 
             if lap_finish is None:
-                if not is_live:
-                    continue
-                observed_end = now
+                observed_end = min(now, end)
                 kind = 'open'
             else:
                 observed_end = lap_finish
                 kind = 'lap'
 
-            # Ucinamy odcinek do zakresu wykresu. W razie niepoprawnych,
-            # nachodzących na siebie danych nie rysujemy odcinków wstecz.
             visible_start = max(start, lap_start, cursor)
             visible_end = min(end, observed_end)
             if visible_end <= visible_start:
@@ -154,7 +135,7 @@ def get_heatmap_context():
             'new_day': local_cursor.strftime('%d.%m') if local_cursor.hour == 0 else '',
         })
         cursor += timedelta(hours=1)
-    # Dwa momenty 02:00 są opisane jako (I) i (II), bez CET/CEST.
+    ticks.append({'label': local_clock_label(end), 'left': 100, 'edge': 'end'})
 
     return {
         'heatmap_rows': rows,
@@ -164,6 +145,5 @@ def get_heatmap_context():
         'heatmap_end': _local(end),
         'heatmap_runner_count': len(rows),
         'heatmap_laps_count': sum(row['laps'] for row in rows),
-        'heatmap_axis_min_width': max(1120, round(span_seconds / 3600 * 85)),
-        'heatmap_config_warning': date_mismatch,
+        'heatmap_axis_min_width': max(1120, round(span_seconds / 3600 * 85))
     }
